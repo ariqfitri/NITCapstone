@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+</head>
+<body>
+    <h1>Sign in</h1>
+
+    <form method="POST" id="login-form">
+        <input type = "text" name="login_username" placeholder ="Username">
+        <br><br>
+        <input type = "password" name="login_password" placeholder ="Password">
+
+        <button type="submit">Login</button>
+    </form>
+    <h4>Do you not have an account? If so, click <a href="{{url_for('register')}}">here</a></h4>
+
+</body>
+</html>

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register</title>
+</head>
+<body>
+    <h1>Create an Account</h1>
+
+    <form method="POST" id="register-form">
+        <input type = "text" name="register_username" placeholder ="Username">
+        <br><br>
+        <input type = "password" name="register_password" placeholder ="Password">
+
+        <button type="submit">Register</button>
+    </form>
+    <h4>Do you already have an account? If so, click <a href="{{url_for('login')}}">here</a></h4>
+</body>
+</html>
