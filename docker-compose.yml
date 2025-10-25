@@ -1,0 +1,93 @@
+services:
+  # MySQL Database Service
+  database:
+    image: mysql:8.0
+    container_name: kidssmart_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${DB_NAME:-kidssmart}
+      MYSQL_USER: ${DB_USER:-kidssmart_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-securepassword}
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    networks:
+      - kidssmart_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Flask Web Application
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: kidssmart_web
+    restart: always
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./:/app
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      FLASK_APP: main.py
+      FLASK_ENV: development
+      DB_HOST: database
+      DB_NAME: ${DB_NAME:-kidssmart}
+      DB_USER: ${DB_USER:-kidssmart_user}
+      DB_PASSWORD: ${DB_PASSWORD:-securepassword}
+    networks:
+      - kidssmart_network
+    command: flask run --host=0.0.0.0
+
+  # Scrapy Scraper Service
+  scraper:
+    build:
+      context: .
+      dockerfile: Dockerfile.scraper
+    container_name: kidssmart_scraper
+    restart: "no"
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      DB_HOST: database
+      DB_NAME: ${DB_NAME:-kidssmart}
+      DB_USER: ${DB_USER:-kidssmart_user}
+      DB_PASSWORD: ${DB_PASSWORD:-securepassword}
+    volumes:
+      - ./kidssmart:/app/kidssmart
+    networks:
+      - kidssmart_network
+    working_dir: /app/kidssmart
+
+  # phpMyAdmin (Optional - for database management)
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: kidssmart_phpmyadmin
+    restart: always
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: database
+      PMA_USER: ${DB_USER:-kidssmart_user}
+      PMA_PASSWORD: ${DB_PASSWORD:-securepassword}
+    depends_on:
+      - database
+    networks:
+      - kidssmart_network
+
+networks:
+  kidssmart_network:
+    driver: bridge
+
+volumes:
+  db_data:
+    driver: local

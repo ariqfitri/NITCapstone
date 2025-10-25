@@ -5,11 +5,13 @@ from sqlalchemy import inspect
 
 from db import db
 import models
+import os
 
 app = Flask(__name__)
 
 # database config
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/kidssmart'
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/kidssmart'
+app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}@database/{os.getenv('DB_NAME')}"
 app.config['SECRET_KEY'] = 'rat'
 
 db.init_app(app)

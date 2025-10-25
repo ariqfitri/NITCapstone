@@ -1,7 +1,4 @@
 import re
-
-import scrapy
-from ..items import KidssmartItem
 import scrapy
 from ..items import KidssmartItem
 
