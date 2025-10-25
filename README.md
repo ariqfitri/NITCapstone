@@ -15,28 +15,28 @@
 
 Update package list and install prerequisites
 
-`sudo apt update
-sudo apt install -y apt-transport-https ca-certificates curl software-properties-common lsb-release`
+`sudo apt update` <br />
+`sudo apt install -y apt-transport-https ca-certificates curl software-properties-common lsb-release`
 
 Add Docker’s GPG key and repository
 
-`sudo mkdir -p /etc/apt/keyrings`
-`curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg`
+`sudo mkdir -p /etc/apt/keyrings` <br />
+`curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg` <br />
 `echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu noble stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null`
 
 Update and install Docker Engine and Compose plugin
 
-`sudo apt update`
+`sudo apt update` <br />
 `sudo apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin`
 
 Start Docker and enable on boot
 
-`sudo systemctl start docker`
+`sudo systemctl start docker` <br />
 `sudo systemctl enable docker`
 
 Add current user to docker group (replace $USER if needed)
 
-`sudo groupadd docker`
+`sudo groupadd docker` <br />
 `sudo usermod -aG docker $USER`
 
 Activate group change (logout/login recommended)
@@ -45,7 +45,7 @@ Activate group change (logout/login recommended)
 
 Verify Docker and Compose installation
 
-`docker --version`
+`docker --version` <br />
 `docker compose version`
 
 ---
@@ -58,7 +58,7 @@ https://www.docker.com/products/docker-desktop/
 Launch Docker Desktop app
 Verify installation
 
-`docker --version`
+`docker --version` <br />
 `docker compose version`
 
 ---
@@ -72,7 +72,7 @@ Mount the DMG, drag Docker app to Applications folder
 Launch Docker Desktop app
 Verify installation
 
-`docker --version`
+`docker --version` <br />
 `docker compose version`
 
 ---
@@ -81,18 +81,18 @@ Verify installation
 
 Make sure to stop XAMPP and system MySQL to free ports 3306 and 80:
 
-`sudo /opt/lampp/lampp stop`
-`sudo systemctl stop mysql`
+`sudo /opt/lampp/lampp stop` <br />
+`sudo systemctl stop mysql` <br />
 `sudo systemctl disable mysql`
 
 ---
 
 ## Set Up KidsSmart Docker Environment
 
-`git clone https://github.com/ariqfitri/NITCapstone.git`
+`git clone https://github.com/ariqfitri/NITCapstone.git` <br />
 `cd NITCapstone`
 
-`docker compose build`
+`docker compose build` <br />
 `docker compose up -d`
 
 ---
@@ -136,7 +136,7 @@ Stop containers
 
 Restart web container after code changes
 
-`docker compose build web`
+`docker compose build web` <br />
 `docker compose up -d web`
 
 Stream Flask web logs
@@ -145,7 +145,7 @@ Stream Flask web logs
 
 Run scraper spiders
 
-`docker compose run --rm scraper scrapy crawl activities`
+`docker compose run --rm scraper scrapy crawl activities` <br />
 `docker compose run --rm scraper scrapy crawl kidsbook`
 
 ---
