@@ -10,6 +10,15 @@ class ActivitySpider(scrapy.Spider):
         'https://www.activeactivities.com.au/directory/category/arts-and-crafts/',
         'https://www.activeactivities.com.au/directory/category/health-and-fitness/',
         'https://www.activeactivities.com.au/directory/category/hobbies/',
+        'https://www.activeactivities.com.au/directory/category/community/',
+        'https://www.activeactivities.com.au/directory/category/education/',
+        'https://www.activeactivities.com.au/directory/category/entertainment/',
+        'https://www.activeactivities.com.au/directory/category/holidays/',
+        'https://www.activeactivities.com.au/directory/category/outdoor-and-adventure/',
+        'https://www.activeactivities.com.au/directory/category/parties/',
+        'https://www.activeactivities.com.au/directory/category/performing-arts/',
+        'https://www.activeactivities.com.au/directory/category/play/',
+        'https://www.activeactivities.com.au/directory/category/sports/'
     ]
 
     def parse(self, response):
@@ -49,8 +58,21 @@ class ActivitySpider(scrapy.Spider):
             item["source_url"] = response.urljoin(listing_url) if listing_url else None
             item["image"] = response.urljoin(image) if image else None
             item["description"] = description.strip() if description else None
-            
-            yield item
+
+            required_fields = [
+                item["title"],
+                item["address"],
+                item["suburb"],
+                item["postcode"],
+                item["activity_type"],
+                item["image"],
+                item["description"]
+            ]
+
+            if all(required_fields):  # only yield if ALL fields are present
+                yield item
+            else:
+                self.logger.info(f" Skipped incomplete record: {item['title']}")
         
         # NEW: Follow pagination if available
         next_page = response.css("a.next::attr(href)").get()
