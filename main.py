@@ -182,9 +182,85 @@ def activity_detail(activity_id):
     
     return render_template('activity_detail.html', activity=activity, reviews=reviews)
 
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    """User registration"""
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+        first_name = request.form.get('first_name')
+        last_name = request.form.get('last_name')
 
-# ... rest of routes (register, login, dashboard, etc.)
+        # Check if user exists
+        existing_user = User.query.filter_by(email=email).first()
+        if existing_user:
+            flash('Email already registered', 'error')
+            return redirect(url_for('register'))
 
+        # Create new user
+        new_user = User(email=email)
+        new_user.set_password(password)
+        db.session.add(new_user)
+        db.session.flush()  # Get user_id before committing
+
+        # Create profile
+        profile = UserProfile(
+            user_id=new_user.user_id,
+            first_name=first_name,
+            last_name=last_name
+        )
+        db.session.add(profile)
+        db.session.commit()
+
+        flash('Registration successful! Please login.', 'success')
+        return redirect(url_for('login'))
+
+    return render_template('register.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    """User login"""
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+
+        user = User.query.filter_by(email=email).first()
+
+        if user and user.check_password(password):
+            # Update last login
+            user.last_login = datetime.utcnow()
+            db.session.commit()
+
+            # Set session
+            session['user_id'] = user.user_id
+            session['email'] = user.email
+            flash('Login successful!', 'success')
+            return redirect(url_for('dashboard'))
+        else:
+            flash('Invalid email or password', 'error')
+            return redirect(url_for('login'))
+
+    return render_template('login.html')
+
+@app.route('/dashboard')
+def dashboard():
+    """User dashboard"""
+    if 'user_id' not in session:
+        flash('Please login first', 'error')
+        return redirect(url_for('login'))
+
+    user = User.query.get(session['user_id'])
+    favorites = UserFavorite.query.filter_by(user_id=user.user_id).all()
+    reviews = UserReview.query.filter_by(user_id=user.user_id).all()
+
+    return render_template('dashboard.html', user=user, favorites=favorites, reviews=reviews)
+
+@app.route('/logout')
+def logout():
+    """User logout"""
+    session.clear()
+    flash('You have been logged out', 'success')
+    return redirect(url_for('index'))
 
 if __name__ == '__main__':
     with app.app_context():
