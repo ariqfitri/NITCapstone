@@ -152,10 +152,10 @@ Run scraper spiders
 
 ## Add current user to docker group (Linux)
 
-`sudo groupadd docker` # If docker group doesn’t exist
-`sudo usermod -aG docker $USER`
-`newgrp docker` # Refresh group membership
-`groups` # Verify group membership
+`sudo groupadd docker` # If docker group doesn’t exist <br />
+`sudo usermod -aG docker $USER` <br />
+`newgrp docker` # Refresh group membership <br />
+`groups` # Verify group membership <br />
 `docker run hello-world` # Test Docker without sudo
 
 ---
@@ -166,7 +166,7 @@ Run scraper spiders
 
 Ensure `main.py` uses Docker service name:
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://kidssmart_user:SecurePass123!@database/kidssmart'
+`app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://kidssmart_user:SecurePass123!@database/kidssmart'`
 
 ---
 
