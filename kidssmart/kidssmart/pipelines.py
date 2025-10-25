@@ -1,28 +1,17 @@
-# Define your item pipelines here
-#
-# Don't forget to add your pipeline to the ITEM_PIPELINES setting
-# See: https://docs.scrapy.org/en/latest/topics/item-pipeline.html
-
-from itemadapter import ItemAdapter
 import pymysql
 from datetime import datetime
 import os
 
 class MySQLActivityPipeline:
-    """
-    Unified pipeline for all activity scrapers.
-    Works with Docker MySQL and saves to kidssmart_app database.
-    """
-    
     def __init__(self):
         self.connection = None
         self.cursor = None
-    
+
     def open_spider(self, spider):
-        """Connect to Docker MySQL database when spider opens"""
+        """Connect to database when spider starts"""
         try:
             self.connection = pymysql.connect(
-                host=os.getenv('DB_HOST', 'database'),  # Docker service name
+                host=os.getenv('DB_HOST', 'database'),
                 user=os.getenv('DB_SCRAPER_USER', 'scraper_user'),
                 password=os.getenv('DB_SCRAPER_PASSWORD', 'ScraperPass123!'),
                 database='kidssmart_app',
@@ -30,108 +19,125 @@ class MySQLActivityPipeline:
                 cursorclass=pymysql.cursors.DictCursor
             )
             self.cursor = self.connection.cursor()
-            spider.logger.info("✅ Database connection opened successfully")
+            spider.logger.info("Database connection opened")
         except Exception as e:
-            spider.logger.error(f"❌ Database connection failed: {e}")
+            spider.logger.error(f"Database connection failed: {e}")
             raise
-    
+
     def close_spider(self, spider):
-        """Close database connection when spider closes"""
+        """Close database connection"""
         if self.cursor:
             self.cursor.close()
         if self.connection:
             self.connection.close()
         spider.logger.info("Database connection closed")
-    
+
     def process_item(self, item, spider):
-        """
-        Process and save activity to database.
-        Detects duplicates by source_url or title.
-        """
+        """Process item and save to database"""
         
-        # Map old field names to new schema
-        title = item.get('title')
-        address = item.get('address')
-        suburb = item.get('suburb')
-        postcode = item.get('postcode')
-        category = item.get('activity_type') or item.get('category')
-        image_url = item.get('image') or item.get('image_url')
-        description = item.get('description')
-        source_url = item.get('source_url') or item.get('url')
-        
-        # Additional fields (if your spiders provide them)
-        phone = item.get('phone')
-        email = item.get('email')
-        website = item.get('website')
-        age_range = item.get('age_range')
-        cost = item.get('cost')
-        schedule = item.get('schedule')
-        
-        # Use spider name as source
-        source_name = spider.name
-        
-        # Check for duplicates by source_url or title
-        try:
-            if source_url:
-                self.cursor.execute(
-                    "SELECT activity_id FROM activities WHERE source_url = %s",
-                    (source_url,)
-                )
-            else:
-                # Fallback to title if no source_url
-                self.cursor.execute(
-                    "SELECT activity_id FROM activities WHERE title = %s AND suburb = %s",
-                    (title, suburb)
-                )
-            
-            existing = self.cursor.fetchone()
-            
-            if existing:
-                spider.logger.info(f"⚠️  Duplicate found: {title} - Skipping")
-                return item
-            
-            # Insert new activity
-            self.cursor.execute(
-                """INSERT INTO activities 
-                (title, description, category, suburb, postcode, address, phone, email, 
-                 website, age_range, cost, schedule, image_url, source_url, source_name, scraped_at)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
-                (
-                    title,
-                    description,
-                    category,
-                    suburb,
-                    postcode,
-                    address,
-                    phone,
-                    email,
-                    website,
-                    age_range,
-                    cost,
-                    schedule,
-                    image_url,
-                    source_url,
-                    source_name,
-                    datetime.now()
-                )
-            )
-            
-            self.connection.commit()
-            spider.logger.info(f"✅ Saved activity: {title} from {source_name}")
-        
-        except Exception as e:
-            self.connection.rollback()
-            spider.logger.error(f"❌ Error saving activity '{title}': {e}")
+        # Normalize kidsbook format to database format
+        if 'provider_name' in item:
+            # This is from kidsbook spider - normalize it
+            normalized_items = self._normalize_kidsbook_item(item, spider)
+            for normalized in normalized_items:
+                self._save_to_db(normalized, spider)
+        else:
+            # This is from activities spider - already has 'title'
+            self._save_to_db(item, spider)
         
         return item
 
+    def _normalize_kidsbook_item(self, item, spider):
+        """Convert kidsbook structure to database structure"""
+        normalized_items = []
+        
+        provider_name = item.get('provider_name', '')
+        category = item.get('category', '')
+        description = item.get('description', '')
+        provider_url = item.get('provider_url', '')
+        
+        contact = item.get('contact', {})
+        phone = contact.get('phone', '')
+        email = contact.get('email', '')
+        website = contact.get('website', '')
+        
+        addresses = item.get('addresses', [])
+        
+        if addresses:
+            for addr in addresses:
+                normalized_items.append({
+                    'title': provider_name,
+                    'description': description,
+                    'category': category,
+                    'suburb': addr.get('suburb', ''),
+                    'postcode': addr.get('postcode', ''),
+                    'address': addr.get('street_address', ''),
+                    'phone': phone,
+                    'email': email,
+                    'website': website,
+                    'source_url': provider_url,
+                })
+        else:
+            normalized_items.append({
+                'title': provider_name,
+                'description': description,
+                'category': category,
+                'suburb': '',
+                'postcode': '',
+                'address': '',
+                'phone': phone,
+                'email': email,
+                'website': website,
+                'source_url': provider_url,
+            })
+        
+        return normalized_items
 
-# Legacy pipeline (keep for backward compatibility if needed)
-class KidssmartPipeline:
-    """
-    DEPRECATED: Use MySQLActivityPipeline instead.
-    This is kept for backward compatibility only.
-    """
-    
-    def __init__(self):
-        spider.logger.warning("⚠️  KidssmartPipeline is deprecated. Use MySQLActivityPipeline instead.")
+    def _save_to_db(self, item, spider):
+        """Save normalized item to database"""
+        # Check for duplicates
+        if item.get('source_url'):
+            self.cursor.execute(
+                "SELECT activity_id FROM activities WHERE source_url = %s",
+                (item.get('source_url'),)
+            )
+        else:
+            self.cursor.execute(
+                "SELECT activity_id FROM activities WHERE title = %s AND suburb = %s",
+                (item.get('title'), item.get('suburb'))
+            )
+        
+        existing = self.cursor.fetchone()
+        
+        if existing:
+            spider.logger.info(f"Duplicate found: {item.get('title')} - Skipping")
+            return
+        
+        # Insert new activity
+        try:
+            self.cursor.execute("""
+                INSERT INTO activities (
+                    title, description, category, suburb, postcode, address,
+                    phone, email, website, source_url, source_name, scraped_at
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """, (
+                item.get('title'),
+                item.get('description'),
+                item.get('category'),
+                item.get('suburb'),
+                item.get('postcode'),
+                item.get('address'),
+                item.get('phone'),
+                item.get('email'),
+                item.get('website'),
+                item.get('source_url'),
+                spider.name,
+                datetime.now()
+            ))
+            
+            self.connection.commit()
+            spider.logger.info(f"Saved activity: {item.get('title')} from {spider.name}")
+            
+        except Exception as e:
+            self.connection.rollback()
+            spider.logger.error(f"Error saving activity '{item.get('title')}': {e}")
