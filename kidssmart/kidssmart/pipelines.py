@@ -19,10 +19,10 @@ class KidssmartPipeline:
         self.conn = mysql.connector.connect(
             host="localhost",
             user="root",
-            password="",         # XAMPP default has no password
-            database="kidssmart" # make sure this database exists in phpMyAdmin
+            password="",
+            database="kidssmart"
         )
-        self.curr = self.conn.cursor()  # <-- fixed typo: was self.com.cursor()
+        self.curr = self.conn.cursor()
 
     def create_table(self):
         self.curr.execute("""
@@ -32,24 +32,35 @@ class KidssmartPipeline:
                 address VARCHAR(255),
                 suburb VARCHAR(255),
                 postcode VARCHAR(20),
-                activity_type VARCHAR(100)
+                activity_type VARCHAR(100),
+                image VARCHAR(500),
+                description TEXT
             )
         """)
 
     def store_db(self, item):
         self.curr.execute("""
-            INSERT INTO activities (title, address, suburb, postcode, activity_type)
-            VALUES (%s, %s, %s, %s, %s)
+            INSERT INTO activities (title, address, suburb, postcode, activity_type, image, description)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            ON DUPLICATE KEY UPDATE
+                address = VALUES(address),
+                suburb = VALUES(suburb),
+                postcode = VALUES(postcode),
+                activity_type = VALUES(activity_type),
+                image = VALUES(image),
+                description = VALUES(description)
         """, (
             item.get('title'),
             item.get('address'),
             item.get('suburb'),
             item.get('postcode'),
-            item.get('activity_type')
+            item.get('activity_type'),
+            item.get('image'),
+            item.get('description')
         ))
         self.conn.commit()
 
     def process_item(self, item, spider):
-        print(f" Pipeline received: {item['title']}")
+        print(f"Pipeline received: {item['title']}")
         self.store_db(item)
         return item

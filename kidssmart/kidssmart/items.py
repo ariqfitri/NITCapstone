@@ -13,4 +13,6 @@ class KidssmartItem(scrapy.Item):
     suburb = scrapy.Field()
     postcode = scrapy.Field()
     activity_type = scrapy.Field()
+    description = scrapy.Field()
+    image = scrapy.Field()
 

@@ -19,6 +19,8 @@ class Activities(db.Model):
     suburb = db.Column(db.String(255))
     postcode = db.Column(db.String(10))
     activity_type = db.Column(db.String(255))
+    image = db.Column(db.String(500))
+    description = db.Column(db.Text)
 
     def __repr__(self):
         return f"<Activity {self.title}>"
