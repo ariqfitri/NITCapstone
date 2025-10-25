@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS users (
     password_hash VARCHAR(255) NOT NULL,
     is_verified BOOLEAN DEFAULT FALSE,
     is_active BOOLEAN DEFAULT TRUE,
+    is_admin BOOLEAN DEFAULT FALSE,  -- NEW: Admin flag
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     last_login TIMESTAMP NULL,
     INDEX idx_email (email)
@@ -25,29 +26,27 @@ CREATE TABLE IF NOT EXISTS user_profiles (
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
--- User favorites (saved activities/books)
+-- User favorites (saved activities)
 CREATE TABLE IF NOT EXISTS user_favorites (
     favorite_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
-    item_type ENUM('activity', 'book') NOT NULL,
-    item_id INT NOT NULL,
+    activity_id INT NOT NULL,  -- CHANGED: Only activities
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-    UNIQUE KEY unique_favorite (user_id, item_type, item_id)
+    UNIQUE KEY unique_favorite (user_id, activity_id)
 );
 
 -- User reviews/ratings
 CREATE TABLE IF NOT EXISTS user_reviews (
     review_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
-    item_type ENUM('activity', 'book') NOT NULL,
-    item_id INT NOT NULL,
+    activity_id INT NOT NULL,  -- CHANGED: Only activities
     rating INT CHECK (rating >= 1 AND rating <= 5),
     review_text TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-    INDEX idx_item (item_type, item_id)
+    INDEX idx_activity (activity_id)
 );
 
 -- Sessions (for login management)

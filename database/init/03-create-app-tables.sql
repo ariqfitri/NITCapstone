@@ -1,6 +1,6 @@
 USE kidssmart_app;
 
--- Activities table (from scraping)
+-- Activities table (unified from all scrapers)
 CREATE TABLE IF NOT EXISTS activities (
     activity_id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
@@ -16,31 +16,16 @@ CREATE TABLE IF NOT EXISTS activities (
     cost VARCHAR(100),
     schedule TEXT,
     image_url VARCHAR(500),
-    source_url VARCHAR(500),
+    source_url VARCHAR(500) UNIQUE,  -- Prevent duplicates
+    source_name VARCHAR(100),  -- NEW: Track which crawler (activeactivities, kidsbook, etc.)
     scraped_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     is_approved BOOLEAN DEFAULT FALSE,
     INDEX idx_category (category),
     INDEX idx_suburb (suburb),
-    INDEX idx_postcode (postcode)
-);
-
--- Books table (from scraping)
-CREATE TABLE IF NOT EXISTS books (
-    book_id INT AUTO_INCREMENT PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    author VARCHAR(255),
-    isbn VARCHAR(20),
-    description TEXT,
-    age_range VARCHAR(50),
-    category VARCHAR(100),
-    cover_image_url VARCHAR(500),
-    source_url VARCHAR(500),
-    scraped_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    is_approved BOOLEAN DEFAULT FALSE,
-    INDEX idx_category (category),
-    INDEX idx_author (author)
+    INDEX idx_postcode (postcode),
+    INDEX idx_source (source_name),
+    INDEX idx_approved (is_approved)
 );
 
 -- Categories reference table
@@ -58,3 +43,14 @@ CREATE TABLE IF NOT EXISTS locations (
     state VARCHAR(50),
     UNIQUE KEY unique_suburb_postcode (suburb, postcode)
 );
+
+-- Insert common categories (examples)
+INSERT IGNORE INTO categories (category_name) VALUES
+    ('Sports'),
+    ('Arts & Crafts'),
+    ('Music'),
+    ('Dance'),
+    ('Swimming'),
+    ('Education'),
+    ('Before/After School Care'),
+    ('Holiday Programs');

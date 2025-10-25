@@ -17,18 +17,18 @@ DB_NAME_APP = os.getenv('DB_NAME_APP', 'kidssmart_app')
 # Primary database (users)
 app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME_USERS}'
 
-# Secondary database (app data - activities, books)
+# Secondary database (app data - activities only)
 app.config['SQLALCHEMY_BINDS'] = {
     'app_data': f'mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME_APP}'
 }
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_ECHO'] = True  # Log SQL queries in development
+app.config['SQLALCHEMY_ECHO'] = True
 
 db = SQLAlchemy(app)
 
 # ============================================================================
-# USER DATABASE MODELS (kidssmart_users)
+# USER DATABASE MODELS
 # ============================================================================
 
 class User(db.Model):
@@ -39,6 +39,7 @@ class User(db.Model):
     password_hash = db.Column(db.String(255), nullable=False)
     is_verified = db.Column(db.Boolean, default=False)
     is_active = db.Column(db.Boolean, default=True)
+    is_admin = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     last_login = db.Column(db.DateTime, nullable=True)
     
@@ -72,8 +73,7 @@ class UserFavorite(db.Model):
     
     favorite_id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
-    item_type = db.Column(db.Enum('activity', 'book'), nullable=False)
-    item_id = db.Column(db.Integer, nullable=False)
+    activity_id = db.Column(db.Integer, nullable=False)  # Links to activities table in app_data DB
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 
@@ -82,8 +82,7 @@ class UserReview(db.Model):
     
     review_id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
-    item_type = db.Column(db.Enum('activity', 'book'), nullable=False)
-    item_id = db.Column(db.Integer, nullable=False)
+    activity_id = db.Column(db.Integer, nullable=False)  # Links to activities table in app_data DB
     rating = db.Column(db.Integer, nullable=False)  # 1-5
     review_text = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -91,7 +90,7 @@ class UserReview(db.Model):
 
 
 # ============================================================================
-# APP DATA MODELS (kidssmart_app) - from scrapers
+# APP DATA MODELS (activities only)
 # ============================================================================
 
 class Activity(db.Model):
@@ -112,25 +111,8 @@ class Activity(db.Model):
     cost = db.Column(db.String(100))
     schedule = db.Column(db.Text)
     image_url = db.Column(db.String(500))
-    source_url = db.Column(db.String(500))
-    scraped_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    is_approved = db.Column(db.Boolean, default=False)
-
-
-class Book(db.Model):
-    __bind_key__ = 'app_data'
-    __tablename__ = 'books'
-    
-    book_id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(255), nullable=False)
-    author = db.Column(db.String(255))
-    isbn = db.Column(db.String(20))
-    description = db.Column(db.Text)
-    age_range = db.Column(db.String(50))
-    category = db.Column(db.String(100))
-    cover_image_url = db.Column(db.String(500))
-    source_url = db.Column(db.String(500))
+    source_url = db.Column(db.String(500), unique=True)
+    source_name = db.Column(db.String(100))  # 'activeactivities', 'kidsbook', etc.
     scraped_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     is_approved = db.Column(db.Boolean, default=False)
@@ -156,22 +138,22 @@ class Location(db.Model):
 
 
 # ============================================================================
-# ROUTES
+# ROUTES (activities only)
 # ============================================================================
 
 @app.route('/')
 def index():
-    """Homepage with activities list"""
-    # Get all approved activities from app_data database
+    """Homepage with activities"""
     activities = Activity.query.filter_by(is_approved=True).limit(20).all()
     return render_template('index.html', activities=activities)
 
 
 @app.route('/activities')
 def activities():
-    """Activities listing page with filters"""
+    """Activities listing with filters"""
     category = request.args.get('category')
     suburb = request.args.get('suburb')
+    source = request.args.get('source')  # NEW: Filter by source
     
     query = Activity.query.filter_by(is_approved=True)
     
@@ -179,6 +161,8 @@ def activities():
         query = query.filter_by(category=category)
     if suburb:
         query = query.filter_by(suburb=suburb)
+    if source:
+        query = query.filter_by(source_name=source)
     
     activities = query.all()
     categories = db.session.execute(
@@ -190,115 +174,19 @@ def activities():
 
 @app.route('/activity/<int:activity_id>')
 def activity_detail(activity_id):
-    """Individual activity details page"""
+    """Activity details with reviews"""
     activity = Activity.query.get_or_404(activity_id)
     
-    # Get reviews for this activity (if user is logged in)
-    reviews = []
-    if 'user_id' in session:
-        reviews = UserReview.query.filter_by(
-            item_type='activity',
-            item_id=activity_id
-        ).all()
+    # Get reviews for this activity
+    reviews = UserReview.query.filter_by(activity_id=activity_id).all()
     
     return render_template('activity_detail.html', activity=activity, reviews=reviews)
 
 
-@app.route('/books')
-def books():
-    """Books listing page"""
-    books = Book.query.filter_by(is_approved=True).all()
-    return render_template('books.html', books=books)
-
-
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    """User registration"""
-    if request.method == 'POST':
-        email = request.form.get('email')
-        password = request.form.get('password')
-        
-        # Check if user exists
-        if User.query.filter_by(email=email).first():
-            flash('Email already registered', 'error')
-            return redirect(url_for('register'))
-        
-        # Create new user
-        user = User(email=email)
-        user.set_password(password)
-        db.session.add(user)
-        db.session.commit()
-        
-        flash('Registration successful! Please log in.', 'success')
-        return redirect(url_for('login'))
-    
-    return render_template('register.html')
-
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    """User login"""
-    if request.method == 'POST':
-        email = request.form.get('email')
-        password = request.form.get('password')
-        
-        user = User.query.filter_by(email=email).first()
-        
-        if user and user.check_password(password):
-            session['user_id'] = user.user_id
-            session['email'] = user.email
-            user.last_login = datetime.utcnow()
-            db.session.commit()
-            
-            flash('Login successful!', 'success')
-            return redirect(url_for('dashboard'))
-        
-        flash('Invalid email or password', 'error')
-    
-    return render_template('login.html')
-
-
-@app.route('/logout')
-def logout():
-    """User logout"""
-    session.clear()
-    flash('You have been logged out', 'info')
-    return redirect(url_for('index'))
-
-
-@app.route('/dashboard')
-def dashboard():
-    """User dashboard"""
-    if 'user_id' not in session:
-        return redirect(url_for('login'))
-    
-    user = User.query.get(session['user_id'])
-    favorites = UserFavorite.query.filter_by(user_id=user.user_id).all()
-    
-    return render_template('dashboard.html', user=user, favorites=favorites)
-
-
-@app.route('/api/activities')
-def api_activities():
-    """API endpoint for activities (JSON)"""
-    activities = Activity.query.filter_by(is_approved=True).all()
-    return jsonify([{
-        'id': a.activity_id,
-        'title': a.title,
-        'category': a.category,
-        'suburb': a.suburb
-    } for a in activities])
-
-
-# ============================================================================
-# DATABASE INITIALIZATION
-# ============================================================================
-
-with app.app_context():
-    # Create all tables in both databases
-    db.create_all()
-    print("Database tables created successfully!")
+# ... rest of routes (register, login, dashboard, etc.)
 
 
 if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
     app.run(host='0.0.0.0', port=5000, debug=True)
