@@ -15,39 +15,38 @@
 
 Update package list and install prerequisites
 
-sudo apt update
-sudo apt install -y apt-transport-https ca-certificates curl software-properties-common lsb-release
+`sudo apt update
+sudo apt install -y apt-transport-https ca-certificates curl software-properties-common lsb-release`
 
 Add Docker’s GPG key and repository
 
-sudo mkdir -p /etc/apt/keyrings
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu noble stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+`sudo mkdir -p /etc/apt/keyrings`
+`curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg`
+`echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu noble stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null`
 
 Update and install Docker Engine and Compose plugin
 
-sudo apt update
-sudo apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+`sudo apt update`
+`sudo apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin`
 
 Start Docker and enable on boot
 
-sudo systemctl start docker
-sudo systemctl enable docker
+`sudo systemctl start docker`
+`sudo systemctl enable docker`
 
 Add current user to docker group (replace $USER if needed)
 
-sudo groupadd docker
-sudo usermod -aG docker $USER
+`sudo groupadd docker`
+`sudo usermod -aG docker $USER`
 
 Activate group change (logout/login recommended)
 
-newgrp docker
+`newgrp docker`
 
 Verify Docker and Compose installation
 
-docker --version
-docker compose version
+`docker --version`
+`docker compose version`
 
 ---
 
@@ -59,8 +58,8 @@ https://www.docker.com/products/docker-desktop/
 Launch Docker Desktop app
 Verify installation
 
-docker --version
-docker compose version
+`docker --version`
+`docker compose version`
 
 ---
 
@@ -73,8 +72,8 @@ Mount the DMG, drag Docker app to Applications folder
 Launch Docker Desktop app
 Verify installation
 
-docker --version
-docker compose version
+`docker --version`
+`docker compose version`
 
 ---
 
@@ -82,25 +81,25 @@ docker compose version
 
 Make sure to stop XAMPP and system MySQL to free ports 3306 and 80:
 
-sudo /opt/lampp/lampp stop
-sudo systemctl stop mysql
-sudo systemctl disable mysql
+`sudo /opt/lampp/lampp stop`
+`sudo systemctl stop mysql`
+`sudo systemctl disable mysql`
 
 ---
 
 ## Set Up KidsSmart Docker Environment
 
-git clone https://github.com/ariqfitri/NITCapstone.git
-cd NITCapstone
+`git clone https://github.com/ariqfitri/NITCapstone.git`
+`cd NITCapstone`
 
-docker compose build
-docker compose up -d
+`docker compose build`
+`docker compose up -d`
 
 ---
 
 ## Verify Running Containers
 
-docker ps
+`docker ps`
 
 Expected containers:
 
@@ -133,31 +132,31 @@ Expected containers:
 
 Stop containers
 
-docker compose down
+`docker compose down`
 
 Restart web container after code changes
 
-docker compose build web
-docker compose up -d web
+`docker compose build web`
+`docker compose up -d web`
 
 Stream Flask web logs
 
-docker compose logs -f web
+`docker compose logs -f web`
 
 Run scraper spiders
 
-docker compose run --rm scraper scrapy crawl activities
-docker compose run --rm scraper scrapy crawl kidsbook
+`docker compose run --rm scraper scrapy crawl activities`
+`docker compose run --rm scraper scrapy crawl kidsbook`
 
 ---
 
 ## Add current user to docker group (Linux)
 
-sudo groupadd docker # If docker group doesn’t exist
-sudo usermod -aG docker $USER
-newgrp docker # Refresh group membership
-groups # Verify group membership
-docker run hello-world # Test Docker without sudo
+`sudo groupadd docker` # If docker group doesn’t exist
+`sudo usermod -aG docker $USER`
+`newgrp docker` # Refresh group membership
+`groups` # Verify group membership
+`docker run hello-world` # Test Docker without sudo
 
 ---
 
