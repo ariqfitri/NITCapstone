@@ -31,7 +31,7 @@
         </div>
         <hr>
         <div class="text-center">
-            <p>&copy; 2024 KidsSmart. All rights reserved.</p>
+            <p>&copy; 2025 KidsSmart. All rights reserved.</p>
         </div>
     </div>
 </footer>

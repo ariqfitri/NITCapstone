@@ -21,7 +21,7 @@ $categories = $program->getCategories();
 // Get suburbs for filter
 $suburbs = $program->getSuburbs();
 
-// If user is logged in, get personalized recommendations
+// If user is logged in, get personalised recommendations
 $recommended_programs = [];
 if (is_logged_in()) {
     $user = new User($db);
@@ -103,9 +103,9 @@ if (is_logged_in()) {
         </div>
     </section>
 
-    <!-- Personalized Recommendations for logged-in users -->
+    <!-- Personalised Recommendations for logged-in users -->
     <?php if (is_logged_in() && count($recommended_programs) > 0): ?>
-    <section class="personalized-recommendations py-5 bg-light">
+    <section class="personalised-recommendations py-5 bg-light">
         <div class="container">
             <h2 class="text-center mb-5">Recommended for You</h2>
             <div class="row">

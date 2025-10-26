@@ -59,7 +59,7 @@ if (is_logged_in()) {
             </div>
         <?php else: ?>
             <div class="alert alert-warning">
-                <i class="fas fa-info-circle"></i> <a href="signup.php" class="alert-link">Sign up</a> or <a href="login.php" class="alert-link">login</a> to save your favourite activities and get personalized recommendations!
+                <i class="fas fa-info-circle"></i> <a href="signup.php" class="alert-link">Sign up</a> or <a href="login.php" class="alert-link">login</a> to save your favourite activities and get personalised recommendations!
             </div>
         <?php endif; ?>
         

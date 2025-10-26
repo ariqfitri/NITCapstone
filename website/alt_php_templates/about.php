@@ -117,8 +117,8 @@ $suburbs = $program->getSuburbs();
                                         <i class="fas fa-user text-primary fa-2x me-3"></i>
                                     </div>
                                     <div>
-                                        <h5>Personalized Experience</h5>
-                                        <p class="text-muted">Get personalized recommendations based on your location and preferences.</p>
+                                        <h5>Personalised Experience</h5>
+                                        <p class="text-muted">Get personalised recommendations based on your location and preferences.</p>
                                     </div>
                                 </div>
                             </div>

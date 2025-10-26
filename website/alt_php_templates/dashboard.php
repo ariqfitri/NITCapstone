@@ -45,7 +45,7 @@ $recommended_activities = $program->getRecommendedActivities($user->suburb, $use
                         <div class="row align-items-center">
                             <div class="col-md-8">
                                 <h1 class="card-title">Welcome back, <?= htmlspecialchars($user->first_name) ?>!</h1>
-                                <p class="card-text">Here's your personalized activity dashboard</p>
+                                <p class="card-text">Here's your personalised activity dashboard</p>
                             </div>
                             <div class="col-md-4 text-md-end">
                                 <div class="bg-white rounded p-3 text-dark">
@@ -146,7 +146,7 @@ $recommended_activities = $program->getRecommendedActivities($user->suburb, $use
                             <div class="text-center py-4">
                                 <i class="fas fa-search fa-3x text-muted mb-3"></i>
                                 <h5>No recommendations yet</h5>
-                                <p class="text-muted">Update your profile to get personalized recommendations</p>
+                                <p class="text-muted">Update your profile to get personalised recommendations</p>
                                 <a href="profile.php" class="btn btn-primary">Update Profile</a>
                             </div>
                         <?php endif; ?>

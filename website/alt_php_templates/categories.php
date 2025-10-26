@@ -37,18 +37,7 @@ foreach ($suburbs as $suburb) {
     <link href="static/css/style.css" rel="stylesheet">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
-            <a class="navbar-brand" href="index.php">
-                <i class="fas fa-child"></i> KidsSmart
-            </a>
-            <div class="navbar-nav ms-auto">
-                <a class="nav-link" href="search.php"><i class="fas fa-search"></i> Find Activities</a>
-                <a class="nav-link active" href="categories.php"><i class="fas fa-list"></i> Categories</a>
-                <a class="nav-link" href="about.php"><i class="fas fa-info-circle"></i> About</a>
-            </div>
-        </div>
-    </nav>
+    <?php include 'includes/header.php'; ?>
 
     <div class="container mt-4">
         <h1>Browse by Category & Location</h1>
@@ -130,14 +119,8 @@ foreach ($suburbs as $suburb) {
         </section>
     </div>
 
-    <footer class="bg-dark text-white py-4 mt-5">
-        <div class="container">
-            <div class="text-center">
-                <p>&copy; 2024 KidsSmart. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
-
+    <?php include 'includes/footer.php'; ?>
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
