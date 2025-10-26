@@ -5,26 +5,20 @@ require_once __DIR__ . '/config/auth.php';
 require_once __DIR__ . '/models/Program.php';
 require_once __DIR__ . '/models/User.php';
 
-// Initialize database connection
-$database = new Database();
-$db = $database->getConnection();
+// Initialize database connections
+$appDatabase = new Database('kidssmart_app');
+$appDb = $appDatabase->getConnection();
 
-// Initialize Program model
-$program = new Program($db);
+$userDatabase = new Database('kidssmart_users');
+$userDb = $userDatabase->getConnection();
 
-// Get featured programs (recently added)
-$featured_programs = $program->getFeaturedPrograms(6);
-
-// Get categories for filter
-$categories = $program->getCategories();
-
-// Get suburbs for filter
-$suburbs = $program->getSuburbs();
+// Initialize Program model with app database
+$program = new Program($appDb);
 
 // If user is logged in, get personalised recommendations
 $recommended_programs = [];
 if (is_logged_in()) {
-    $user = new User($db);
+    $user = new User($userDb);  // ✅ CORRECT! Using users database for User model
     $user->user_id = get_current_user_id();
     if ($user->readOne()) {
         $recommended_programs = $program->getRecommendedActivities($user->suburb, $user->child_age_range, 3);
