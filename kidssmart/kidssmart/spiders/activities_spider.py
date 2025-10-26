@@ -59,16 +59,6 @@ class ActivitySpider(scrapy.Spider):
             item["image"] = response.urljoin(image) if image else None
             item["description"] = description.strip() if description else None
 
-            required_fields = [
-                item["title"],
-                item["address"],
-                item["suburb"],
-                item["postcode"],
-                item["activity_type"],
-                item["image"],
-                item["description"]
-            ]
-
             yield item
 
         
