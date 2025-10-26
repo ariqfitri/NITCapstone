@@ -1,8 +1,9 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
+from db import db  # Import the shared db instance
 
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
@@ -17,7 +18,7 @@ DB_NAME_APP = os.getenv('DB_NAME_APP', 'kidssmart_app')
 # Primary database (users)
 app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME_USERS}'
 
-# Secondary database (app data - activities only)
+# Secondary database (app data - activities)
 app.config['SQLALCHEMY_BINDS'] = {
     'app_data': f'mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME_APP}'
 }
@@ -25,6 +26,8 @@ app.config['SQLALCHEMY_BINDS'] = {
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 
+# Initialize the shared db instance with the app
+#db.init_app(app)
 db = SQLAlchemy(app)
 
 # ============================================================================

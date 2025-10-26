@@ -1,4 +1,6 @@
   <?php
+    require_once 'config/db_config.php';
+    
    // Register Custom Post Types and Taxonomies
    function kidssmart_register_post_types() {
        // Program Post Type

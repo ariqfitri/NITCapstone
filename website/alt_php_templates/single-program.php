@@ -1,4 +1,7 @@
-<?php get_header(); ?>
+<?php 
+get_header(); 
+require_once 'config/db_config.php';
+?>
 
 <div class="container">
     <div class="program-single">

@@ -29,3 +29,5 @@ Thumbs.db
 *.sql.gz
 *.sql.backup
 db_data/
+
+website/
