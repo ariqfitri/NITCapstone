@@ -1,0 +1,123 @@
+.hero-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.hero-section h1 {
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.badge {
+    font-size: 0.75em;
+}
+
+.stats-section h3 {
+    font-size: 2.5rem;
+}
+
+.social-links a {
+    transition: opacity 0.3s ease;
+}
+
+.social-links a:hover {
+    opacity: 0.7;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .display-4 {
+        font-size: 2rem;
+    }
+    
+    .hero-section .row {
+        text-align: center;
+    }
+}
+
+/* Additional styles for new pages */
+
+/* Breadcrumb styling */
+.breadcrumb {
+    background-color: #f8f9fa;
+    border-radius: 0.375rem;
+}
+
+/* Card hover effects for categories */
+.categories .card {
+    transition: all 0.3s ease;
+}
+
+.categories .card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+/* Stretched link for suburb cards */
+.card .stretched-link::after {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1;
+    content: "";
+}
+
+/* Print styles */
+@media print {
+    .navbar, .breadcrumb, .card .btn, footer {
+        display: none !important;
+    }
+    
+    .card {
+        border: 1px solid #000 !important;
+        box-shadow: none !important;
+    }
+}
+
+/* Badge enhancements */
+.badge {
+    font-size: 0.75em;
+    font-weight: 500;
+}
+
+/* Alert styling */
+.alert-info {
+    border-left: 4px solid #0dcaf0;
+}
+
+/* Quick actions button styling */
+.btn {
+    transition: all 0.2s ease;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .display-4 {
+        font-size: 2rem;
+    }
+    
+    .hero-section .row {
+        text-align: center;
+    }
+    
+    .card-img-top {
+        height: 150px !important;
+    }
+}
+
+/* Category icons */
+.fa-futbol { color: #28a745; }
+.fa-music { color: #e83e8c; }
+.fa-paint-brush { color: #ffc107; }
+.fa-swimmer { color: #17a2b8; }
+.fa-book { color: #6f42c1; }

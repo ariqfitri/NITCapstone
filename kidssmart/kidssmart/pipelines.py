@@ -12,8 +12,8 @@ class MySQLActivityPipeline:
         try:
             self.connection = pymysql.connect(
                 host=os.getenv('DB_HOST', 'database'),
-                user=os.getenv('DB_SCRAPER_USER', 'scraper_user'),
-                password=os.getenv('DB_SCRAPER_PASSWORD', 'ScraperPass123!'),
+                user=os.getenv('SCRAPER_USER', 'scraper_user'),
+                password=os.getenv('SCRAPER_PASSWORD', 'ScraperPass123!'),
                 database='kidssmart_app',
                 charset='utf8mb4',
                 cursorclass=pymysql.cursors.DictCursor

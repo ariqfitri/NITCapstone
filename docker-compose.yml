@@ -1,26 +1,25 @@
-# MySQL Database Service
+version: '3.8'
+
 services:
   database:
     image: mysql:8.0
     container_name: kidssmart_db
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
-      MYSQL_DATABASE: kidssmart_app  # Default database created on first start
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root_password_123}
     volumes:
       - db_data:/var/lib/mysql
-      - ./database/init:/docker-entrypoint-initdb.d  # SQL initialization scripts
+      - ./database/init:/docker-entrypoint-initdb.d
     ports:
       - "3306:3306"
     networks:
       - kidssmart_network
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD}"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD:-root_password_123}"]
       timeout: 20s
       retries: 10
       interval: 10s
 
-  # Flask Web Application
   web:
     build:
       context: .
@@ -38,14 +37,51 @@ services:
       FLASK_APP: main.py
       FLASK_ENV: development
       DB_HOST: database
-      DB_NAME: ${DB_NAME:-kidssmart}
-      DB_USER: ${DB_USER:-kidssmart_user}
-      DB_PASSWORD: ${DB_PASSWORD:-securepassword}
+      DB_NAME_USERS: ${DB_NAME_USERS:-kidssmart_users}
+      DB_NAME_APP: ${DB_NAME_APP:-kidssmart_app}
+      DB_USER: ${DB_USER:-app_user}
+      DB_PASSWORD: ${DB_PASSWORD:-AppPass123!}
+      SECRET_KEY: ${SECRET_KEY:-dev-secret-key-change-in-production}
     networks:
       - kidssmart_network
     command: flask run --host=0.0.0.0
 
-  # Scrapy Scraper Service
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: kidssmart_phpmyadmin
+    restart: always
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: database
+      PMA_USER: ${DB_USER:-app_user}
+      PMA_PASSWORD: ${DB_PASSWORD:-AppPass123!}
+    depends_on:
+      - database
+    networks:
+      - kidssmart_network
+
+  php:
+    build:
+      context: ./website/alt_php_templates
+      dockerfile: Dockerfile.php
+    container_name: kidssmart_php
+    ports:
+      - "8081:80"
+    volumes:
+      - ./website/alt_php_templates:/var/www/html
+      - ./website/static:/var/www/html/static
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      DB_HOST: database
+      DB_NAME: ${DB_NAME_APP:-kidssmart_app}
+      DB_USER: ${DB_USER:-app_user}
+      DB_PASSWORD: ${DB_PASSWORD:-AppPass123!}
+    networks:
+      - kidssmart_network
+
   scraper:
     build:
       context: .
@@ -57,30 +93,14 @@ services:
         condition: service_healthy
     environment:
       DB_HOST: database
-      DB_NAME: ${DB_NAME:-kidssmart}
-      DB_USER: ${DB_USER:-kidssmart_user}
-      DB_PASSWORD: ${DB_PASSWORD:-securepassword}
+      DB_NAME: ${DB_NAME_APP}
+      DB_USER: ${SCRAPER_USER}
+      DB_PASSWORD: ${SCRAPER_PASSWORD}
     volumes:
       - ./kidssmart:/app/kidssmart
     networks:
       - kidssmart_network
     working_dir: /app/kidssmart
-
-  # phpMyAdmin (Optional - for database management)
-  phpmyadmin:
-    image: phpmyadmin:latest
-    container_name: kidssmart_phpmyadmin
-    restart: always
-    ports:
-      - "8080:80"
-    environment:
-      PMA_HOST: database
-      PMA_USER: ${DB_USER:-kidssmart_user}
-      PMA_PASSWORD: ${DB_PASSWORD:-securepassword}
-    depends_on:
-      - database
-    networks:
-      - kidssmart_network
 
 networks:
   kidssmart_network:
