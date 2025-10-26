@@ -6,11 +6,11 @@ class Database {
     private $password;
     public $conn;
 
-    public function __construct() {
+    public function __construct($database_name = null) {
         $this->host = getenv('DB_HOST') ?: 'database';
-        $this->db_name = getenv('DB_NAME') ?: 'kidssmart_users'; 
         $this->username = getenv('DB_USER') ?: 'app_user';
         $this->password = getenv('DB_PASSWORD') ?: 'AppPass123!';
+        $this->db_name = $database_name ?: (getenv('DB_NAME') ?: 'kidssmart_users');
     }
 
     public function getConnection() {
@@ -24,7 +24,6 @@ class Database {
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch(PDOException $exception) {
             error_log("Connection error: " . $exception->getMessage());
-            // Don't display errors to users in production
             echo "Database connection failed. Please try again later.";
         }
         return $this->conn;
