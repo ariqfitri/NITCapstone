@@ -1,10 +1,30 @@
 <?php
-require_once 'config/database.php';
-require_once 'models/Program.php';
+require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/config/auth.php';
+require_once __DIR__ . '/models/Program.php';
+require_once __DIR__ . '/models/User.php';
+require_once __DIR__ . '/models/Favourite.php';
 
 $database = new Database();
 $db = $database->getConnection();
 $program = new Program($db);
+$favourite = new Favourite($db);
+
+// Handle favourite actions
+if (is_logged_in() && ($_POST['favourite_action'] ?? false)) {
+    $favourite->user_id = get_current_user_id();
+    $favourite->activity_id = $_POST['activity_id'] ?? 0;
+    
+    if ($_POST['favourite_action'] === 'add') {
+        $favourite->create();
+    } elseif ($_POST['favourite_action'] === 'remove') {
+        $favourite->delete();
+    }
+    
+    // Redirect to avoid form resubmission
+    header("Location: program_detail.php?id=" . $_POST['activity_id']);
+    exit;
+}
 
 // Get program ID from URL
 $program_id = $_GET['id'] ?? 0;
@@ -22,6 +42,14 @@ if (!$activity) {
     exit;
 }
 
+// Check if current user has favourited this activity
+$is_favourited = false;
+if (is_logged_in()) {
+    $favourite->user_id = get_current_user_id();
+    $favourite->activity_id = $program_id;
+    $is_favourited = $favourite->isFavourited();
+}
+
 // Get related programs (same category)
 $related_programs = $program->searchPrograms('', $activity['category'], '', 1, 4);
 ?>
@@ -37,18 +65,7 @@ $related_programs = $program->searchPrograms('', $activity['category'], '', 1, 4
     <link href="static/css/style.css" rel="stylesheet">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
-            <a class="navbar-brand" href="index.php">
-                <i class="fas fa-child"></i> KidsSmart
-            </a>
-            <div class="navbar-nav ms-auto">
-                <a class="nav-link" href="search.php"><i class="fas fa-search"></i> Find Activities</a>
-                <a class="nav-link" href="categories.php"><i class="fas fa-list"></i> Categories</a>
-                <a class="nav-link" href="about.php"><i class="fas fa-info-circle"></i> About</a>
-            </div>
-        </div>
-    </nav>
+    <?php include 'includes/header.php'; ?>
 
     <div class="container mt-4">
         <!-- Breadcrumb -->
@@ -68,7 +85,29 @@ $related_programs = $program->searchPrograms('', $activity['category'], '', 1, 4
                         <img src="<?= htmlspecialchars($activity['image_url']) ?>" class="card-img-top" alt="<?= htmlspecialchars($activity['title']) ?>" style="max-height: 400px; object-fit: cover;">
                     <?php endif; ?>
                     <div class="card-body">
-                        <h1 class="card-title"><?= htmlspecialchars($activity['title']) ?></h1>
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <h1 class="card-title"><?= htmlspecialchars($activity['title']) ?></h1>
+                            <?php if (is_logged_in()): ?>
+                                <form method="post" class="d-inline">
+                                    <input type="hidden" name="activity_id" value="<?= $activity['activity_id'] ?>">
+                                    <?php if ($is_favourited): ?>
+                                        <input type="hidden" name="favourite_action" value="remove">
+                                        <button type="submit" class="btn btn-danger" title="Remove from favourites">
+                                            <i class="fas fa-heart"></i> Remove Favourite
+                                        </button>
+                                    <?php else: ?>
+                                        <input type="hidden" name="favourite_action" value="add">
+                                        <button type="submit" class="btn btn-outline-danger" title="Add to favourites">
+                                            <i class="far fa-heart"></i> Add to Favourites
+                                        </button>
+                                    <?php endif; ?>
+                                </form>
+                            <?php else: ?>
+                                <a href="login.php?redirect=program_detail.php?id=<?= $activity['activity_id'] ?>" class="btn btn-outline-primary">
+                                    <i class="fas fa-sign-in-alt"></i> Login to Save
+                                </a>
+                            <?php endif; ?>
+                        </div>
                         
                         <!-- Badges -->
                         <div class="mb-3">
@@ -169,6 +208,28 @@ $related_programs = $program->searchPrograms('', $activity['category'], '', 1, 4
                         <h5 class="card-title mb-0">Quick Actions</h5>
                     </div>
                     <div class="card-body">
+                        <!-- Favourite Button -->
+                        <?php if (is_logged_in()): ?>
+                            <form method="post" class="d-grid mb-3">
+                                <input type="hidden" name="activity_id" value="<?= $activity['activity_id'] ?>">
+                                <?php if ($is_favourited): ?>
+                                    <input type="hidden" name="favourite_action" value="remove">
+                                    <button type="submit" class="btn btn-danger w-100 mb-2">
+                                        <i class="fas fa-heart"></i> Remove from Favourites
+                                    </button>
+                                <?php else: ?>
+                                    <input type="hidden" name="favourite_action" value="add">
+                                    <button type="submit" class="btn btn-outline-danger w-100 mb-2">
+                                        <i class="far fa-heart"></i> Add to Favourites
+                                    </button>
+                                <?php endif; ?>
+                            </form>
+                        <?php else: ?>
+                            <a href="login.php?redirect=program_detail.php?id=<?= $activity['activity_id'] ?>" class="btn btn-outline-primary w-100 mb-2">
+                                <i class="fas fa-heart"></i> Login to Save
+                            </a>
+                        <?php endif; ?>
+                        
                         <?php if (!empty($activity['website'])): ?>
                             <a href="<?= htmlspecialchars($activity['website']) ?>" target="_blank" class="btn btn-primary w-100 mb-2">
                                 <i class="fas fa-external-link-alt"></i> Visit Website
@@ -238,14 +299,7 @@ $related_programs = $program->searchPrograms('', $activity['category'], '', 1, 4
         </div>
     </div>
 
-    <footer class="bg-dark text-white py-4 mt-5">
-        <div class="container">
-            <div class="text-center">
-                <p>&copy; 2024 KidsSmart. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
-
+    <?php include 'includes/footer.php'; ?>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

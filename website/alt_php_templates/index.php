@@ -1,7 +1,9 @@
 <?php
-// Include database configuration
-require_once 'config/database.php';
-require_once 'models/Program.php';
+// Include database configuration and auth
+require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/config/auth.php';
+require_once __DIR__ . '/models/Program.php';
+require_once __DIR__ . '/models/User.php';
 
 // Initialize database connection
 $database = new Database();
@@ -18,6 +20,16 @@ $categories = $program->getCategories();
 
 // Get suburbs for filter
 $suburbs = $program->getSuburbs();
+
+// If user is logged in, get personalized recommendations
+$recommended_programs = [];
+if (is_logged_in()) {
+    $user = new User($db);
+    $user->user_id = get_current_user_id();
+    if ($user->readOne()) {
+        $recommended_programs = $program->getRecommendedActivities($user->suburb, $user->child_age_range, 3);
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -31,20 +43,9 @@ $suburbs = $program->getSuburbs();
     <link href="static/css/style.css" rel="stylesheet">
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
-            <a class="navbar-brand" href="index.php">
-                <i class="fas fa-child"></i> KidsSmart
-            </a>
-            <div class="navbar-nav ms-auto">
-                <a class="nav-link" href="search.php"><i class="fas fa-search"></i> Find Activities</a>
-                <a class="nav-link" href="categories.php"><i class="fas fa-list"></i> Categories</a>
-                <a class="nav-link" href="about.php"><i class="fas fa-info-circle"></i> About</a>
-            </div>
-        </div>
-    </nav>
+    <?php include 'includes/header.php'; ?>
 
+    <!-- Rest of your existing index.php content remains the same -->
     <!-- Hero Section -->
     <section class="hero-section bg-light py-5">
         <div class="container">
@@ -55,6 +56,11 @@ $suburbs = $program->getSuburbs();
                     <a href="search.php" class="btn btn-primary btn-lg mt-3">
                         <i class="fas fa-search"></i> Explore Activities
                     </a>
+                    <?php if (!is_logged_in()): ?>
+                        <a href="signup.php" class="btn btn-outline-primary btn-lg mt-3">
+                            <i class="fas fa-user-plus"></i> Join Free
+                        </a>
+                    <?php endif; ?>
                 </div>
                 <div class="col-lg-6">
                     <img src="static/images/hero-image.jpg" alt="Kids Activities" class="img-fluid rounded" style="max-height: 400px;">
@@ -96,6 +102,48 @@ $suburbs = $program->getSuburbs();
             </div>
         </div>
     </section>
+
+    <!-- Personalized Recommendations for logged-in users -->
+    <?php if (is_logged_in() && count($recommended_programs) > 0): ?>
+    <section class="personalized-recommendations py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center mb-5">Recommended for You</h2>
+            <div class="row">
+                <?php foreach ($recommended_programs as $activity): ?>
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="card h-100 shadow-sm">
+                            <?php if (!empty($activity['image_url'])): ?>
+                                <img src="<?= htmlspecialchars($activity['image_url']) ?>" class="card-img-top" alt="<?= htmlspecialchars($activity['title']) ?>" style="height: 200px; object-fit: cover;">
+                            <?php else: ?>
+                                <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height: 200px;">
+                                    <i class="fas fa-child fa-3x text-white"></i>
+                                </div>
+                            <?php endif; ?>
+                            <div class="card-body">
+                                <h5 class="card-title"><?= htmlspecialchars($activity['title']) ?></h5>
+                                <p class="card-text text-muted">
+                                    <i class="fas fa-map-marker-alt"></i> <?= htmlspecialchars($activity['suburb']) ?>
+                                    <?php if (!empty($activity['postcode'])): ?>
+                                        , <?= htmlspecialchars($activity['postcode']) ?>
+                                    <?php endif; ?>
+                                </p>
+                                <?php if (!empty($activity['category'])): ?>
+                                    <span class="badge bg-primary"><?= htmlspecialchars($activity['category']) ?></span>
+                                <?php endif; ?>
+                                <?php if (!empty($activity['age_range'])): ?>
+                                    <span class="badge bg-info"><?= htmlspecialchars($activity['age_range']) ?></span>
+                                <?php endif; ?>
+                            </div>
+                            <div class="card-footer">
+                                <a href="program_detail.php?id=<?= $activity['activity_id'] ?>" class="btn btn-outline-primary btn-sm">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </section>
+    <?php endif; ?>
 
     <!-- Featured Programs -->
     <section class="featured-programs py-5">
@@ -168,38 +216,7 @@ $suburbs = $program->getSuburbs();
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="bg-dark text-white py-4">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6">
-                    <h5>KidsSmart</h5>
-                    <p>Helping parents find the best activities for their children.</p>
-                </div>
-                <div class="col-md-3">
-                    <h5>Quick Links</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="search.php" class="text-white">Find Activities</a></li>
-                        <li><a href="categories.php" class="text-white">Categories</a></li>
-                        <li><a href="about.php" class="text-white">About Us</a></li>
-                    </ul>
-                </div>
-                <div class="col-md-3">
-                    <h5>Connect</h5>
-                    <div class="social-links">
-                        <a href="#" class="text-white me-2"><i class="fab fa-facebook"></i></a>
-                        <a href="#" class="text-white me-2"><i class="fab fa-twitter"></i></a>
-                        <a href="#" class="text-white"><i class="fab fa-instagram"></i></a>
-                    </div>
-                </div>
-            </div>
-            <hr>
-            <div class="text-center">
-                <p>&copy; 2024 KidsSmart. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
-
+    <?php include 'includes/footer.php'; ?>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

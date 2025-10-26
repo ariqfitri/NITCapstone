@@ -1,6 +1,7 @@
 <?php
-require_once 'config/database.php';
-require_once 'models/Program.php';
+require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/config/auth.php';
+require_once __DIR__ . '/models/Program.php';
 
 $database = new Database();
 $db = $database->getConnection();

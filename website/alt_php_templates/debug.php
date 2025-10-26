@@ -1,5 +1,5 @@
 <?php
-require_once 'config/database.php';
+require_once __DIR__ . '/config/database.php';
 
 echo "<h1>Database Debug Information</h1>";
 

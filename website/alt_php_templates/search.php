@@ -1,6 +1,9 @@
 <?php
-require_once 'config/database.php';
-require_once 'models/Program.php';
+require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/config/auth.php';
+require_once __DIR__ . '/models/Program.php';
+require_once __DIR__ . '/models/User.php';
+require_once __DIR__ . '/models/Favourite.php';
 
 $database = new Database();
 $db = $database->getConnection();
@@ -21,6 +24,17 @@ $suburbs = $program->getSuburbs();
 // Use the new count method instead of searching again
 $total_results = $program->getSearchCount($search, $category, $suburb);
 $total_pages = ceil($total_results / $limit);
+
+// Check favourites for logged-in users
+$favourite = new Favourite($db);
+if (is_logged_in()) {
+    $user_favourites = [];
+    foreach ($programs as $activity) {
+        $favourite->user_id = get_current_user_id();
+        $favourite->activity_id = $activity['activity_id'];
+        $user_favourites[$activity['activity_id']] = $favourite->isFavourited();
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -34,21 +48,20 @@ $total_pages = ceil($total_results / $limit);
     <link href="static/css/style.css" rel="stylesheet">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
-            <a class="navbar-brand" href="index.php">
-                <i class="fas fa-child"></i> KidsSmart
-            </a>
-            <div class="navbar-nav ms-auto">
-                <a class="nav-link active" href="search.php"><i class="fas fa-search"></i> Find Activities</a>
-                <a class="nav-link" href="categories.php"><i class="fas fa-list"></i> Categories</a>
-                <a class="nav-link" href="about.php"><i class="fas fa-info-circle"></i> About</a>
-            </div>
-        </div>
-    </nav>
+    <?php include 'includes/header.php'; ?>
 
     <div class="container mt-4">
         <h1>Find Kids Activities</h1>
+        
+        <?php if (is_logged_in()): ?>
+            <div class="alert alert-info">
+                <i class="fas fa-star"></i> You're logged in! Save your favourite activities for quick access.
+            </div>
+        <?php else: ?>
+            <div class="alert alert-warning">
+                <i class="fas fa-info-circle"></i> <a href="signup.php" class="alert-link">Sign up</a> or <a href="login.php" class="alert-link">login</a> to save your favourite activities and get personalized recommendations!
+            </div>
+        <?php endif; ?>
         
         <!-- Search Form -->
         <div class="card mb-4">
@@ -102,7 +115,25 @@ $total_pages = ceil($total_results / $limit);
                                 </div>
                             <?php endif; ?>
                             <div class="card-body">
-                                <h5 class="card-title"><?= htmlspecialchars($activity['title']) ?></h5>
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h5 class="card-title"><?= htmlspecialchars($activity['title']) ?></h5>
+                                    <?php if (is_logged_in()): ?>
+                                        <form method="post" action="program_detail.php?id=<?= $activity['activity_id'] ?>" class="d-inline">
+                                            <input type="hidden" name="activity_id" value="<?= $activity['activity_id'] ?>">
+                                            <?php if ($user_favourites[$activity['activity_id']] ?? false): ?>
+                                                <input type="hidden" name="favourite_action" value="remove">
+                                                <button type="submit" class="btn btn-sm btn-danger" title="Remove from favourites">
+                                                    <i class="fas fa-heart"></i>
+                                                </button>
+                                            <?php else: ?>
+                                                <input type="hidden" name="favourite_action" value="add">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Add to favourites">
+                                                    <i class="far fa-heart"></i>
+                                                </button>
+                                            <?php endif; ?>
+                                        </form>
+                                    <?php endif; ?>
+                                </div>
                                 <p class="card-text text-muted">
                                     <i class="fas fa-map-marker-alt"></i> <?= htmlspecialchars($activity['suburb']) ?>
                                     <?php if (!empty($activity['postcode'])): ?>
@@ -151,14 +182,7 @@ $total_pages = ceil($total_results / $limit);
         <?php endif; ?>
     </div>
 
-    <footer class="bg-dark text-white py-4 mt-5">
-        <div class="container">
-            <div class="text-center">
-                <p>&copy; 2024 KidsSmart. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
-
+    <?php include 'includes/footer.php'; ?>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -200,5 +200,38 @@ class Program {
         }
     }
 
+    // Get recommended activities based on user preferences
+    public function getRecommendedActivities($suburb = '', $age_range = '', $limit = 6) {
+        try {
+            $query = "SELECT * FROM " . $this->table_name . " WHERE is_approved = 1";
+            $params = [];
+            
+            if (!empty($suburb)) {
+                $query .= " AND suburb = ?";
+                $params[] = $suburb;
+            }
+            
+            if (!empty($age_range)) {
+                $query .= " AND (age_range LIKE ? OR age_range IS NULL)";
+                $params[] = "%$age_range%";
+            }
+            
+            $query .= " ORDER BY RAND() LIMIT " . (int)$limit;
+            
+            $stmt = $this->conn->prepare($query);
+            
+            if (!empty($params)) {
+                $stmt->execute($params);
+            } else {
+                $stmt->execute();
+            }
+            
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Database error in getRecommendedActivities: " . $e->getMessage());
+            return [];
+        }
+    }
+
 }
 ?>
