@@ -233,5 +233,38 @@ class Program {
         }
     }
 
+    // Get category statistics
+    public function getCategoryStats() {
+        try {
+            $query = "SELECT category as category_name, COUNT(*) as activity_count 
+                    FROM " . $this->table_name . " 
+                    WHERE category IS NOT NULL AND category != '' 
+                    GROUP BY category 
+                    ORDER BY activity_count DESC";
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Database error in getCategoryStats: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    // Get recent activities
+    public function getRecentActivities($days = 7) {
+        try {
+            $query = "SELECT * FROM " . $this->table_name . " 
+                    WHERE scraped_at >= DATE_SUB(NOW(), INTERVAL ? DAY) 
+                    ORDER BY scraped_at DESC";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(1, $days, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Database error in getRecentActivities: " . $e->getMessage());
+            return [];
+        }
+    }
+
 }
 ?>
