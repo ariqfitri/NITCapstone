@@ -54,9 +54,8 @@ if ($_POST['signup'] ?? false) {
             $user->child_age_range = $child_age_range;
 
             if ($user->create()) {
-                $success = true;
-                // Auto-login after successful registration
-                if ($user->login()) {
+                // Auto-login after successful registration using the new method
+                if ($user->loginAfterRegistration($password)) {
                     $_SESSION['user_id'] = $user->user_id;
                     $_SESSION['user_data'] = [
                         'username' => $user->username,
@@ -65,6 +64,10 @@ if ($_POST['signup'] ?? false) {
                         'last_name' => $user->last_name
                     ];
                     header("Location: dashboard.php");
+                    exit;
+                } else {
+                    // If auto-login fails, redirect to login with success message
+                    header("Location: login.php?signup=success");
                     exit;
                 }
             } else {

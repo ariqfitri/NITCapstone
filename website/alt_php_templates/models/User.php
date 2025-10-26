@@ -180,5 +180,22 @@ class User {
         }
     }
 
+    // Login after signing up
+    public function loginAfterRegistration($plain_password) {
+        // Store the original password_hash temporarily
+        $original_password_hash = $this->password_hash;
+        
+        // Temporarily set the plain password for verification
+        $this->password_hash = $plain_password;
+        
+        // Try to login
+        $login_success = $this->login();
+        
+        // Restore the original password hash
+        $this->password_hash = $original_password_hash;
+        
+        return $login_success;
+    }
+
 }
 ?>
