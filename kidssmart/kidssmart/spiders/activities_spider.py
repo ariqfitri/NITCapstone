@@ -69,10 +69,8 @@ class ActivitySpider(scrapy.Spider):
                 item["description"]
             ]
 
-            if all(required_fields):  # only yield if ALL fields are present
-                yield item
-            else:
-                self.logger.info(f" Skipped incomplete record: {item['title']}")
+            yield item
+
         
         # NEW: Follow pagination if available
         next_page = response.css("a.next::attr(href)").get()
