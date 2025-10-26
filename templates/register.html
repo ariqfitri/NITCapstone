@@ -3,17 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <title>Register</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.2.0/mdb.min.css" rel="stylesheet" />
+
+    <!-- Style -->
+    <style>
+        body {
+            padding-top: 100px;
+            background-color: #f8f9fa;
+        }
+
+        .register-container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-logo {
+            height: 60px;
+            width: auto;
+        }
+    </style>
 </head>
+
 <body>
-    <h1>Create an Account</h1>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg fixed-top bg-light navbar-light shadow-sm">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <img src="https://i.imgur.com/EyzrSWx.png" alt="KidSmart Logo" class="navbar-logo" draggable="false">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item ms-3">
+                        <a class="btn btn-dark btn-rounded" href="{{ url_for('register') }}">Register</a>
+                    </li>
+                    <li class="nav-item ms-3">
+                        <a class="btn btn-dark btn-rounded" href="{{ url_for('login') }}">Sign in</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
-    <form method="POST" id="register-form">
-        <input type = "text" name="register_username" placeholder ="Username">
-        <br><br>
-        <input type = "password" name="register_password" placeholder ="Password">
+    <!-- Registration Form -->
+    <div class="register-container mt-5">
+        <h3 class="text-center mb-4">Create an Account</h3>
 
-        <button type="submit">Register</button>
-    </form>
-    <h4>Do you already have an account? If so, click <a href="{{url_for('login')}}">here</a></h4>
+        <form method="POST" id="register-form">
+            <!-- Username input -->
+            <div data-mdb-input-init class="form-outline mb-4">
+                <input type="text" id="registerUsername" name="register_username" class="form-control" required />
+                <label class="form-label" for="registerUsername">Username</label>
+            </div>
+
+            <!-- Password input -->
+            <div data-mdb-input-init class="form-outline mb-4">
+                <input type="password" id="registerPassword" name="register_password" class="form-control" required />
+                <label class="form-label" for="registerPassword">Password</label>
+            </div>
+
+            <!-- Submit button -->
+            <button type="submit" class="btn btn-primary btn-block mb-4">Register</button>
+
+            <!-- Login redirect -->
+            <div class="text-center">
+                <p>Already have an account? <a href="{{ url_for('login') }}">Sign in here</a></p>
+            </div>
+        </form>
+    </div>
+
+    <!-- JS Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.2.0/mdb.umd.min.js"></script>
 </body>
 </html>
