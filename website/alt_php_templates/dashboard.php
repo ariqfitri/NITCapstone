@@ -1,17 +1,24 @@
 <?php
 require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/config/auth.php';
-require_once __DIR__ . '/models/Program.php';
 require_once __DIR__ . '/models/User.php';
+require_once __DIR__ . '/models/Program.php';
 require_once __DIR__ . '/models/Favourite.php';
 
 redirect_if_not_logged_in();
 
-$database = new Database();
-$db = $database->getConnection();
-$user = new User($db);
-$favourite = new Favourite($db);
-$program = new Program($db);
+// User database connection (for users and favourites)
+$userDatabase = new Database('kidssmart_users'); // Explicitly specify users DB
+$userDb = $userDatabase->getConnection();
+
+// App database connection (for activities/programs)
+$appDatabase = new Database('kidssmart_app'); // Explicitly specify app DB
+$appDb = $appDatabase->getConnection();
+
+// Initialize models with correct database connections
+$user = new User($userDb);
+$favourite = new Favourite($userDb);
+$program = new Program($appDb); // Program model uses app database
 
 $user->user_id = get_current_user_id();
 $user->readOne();

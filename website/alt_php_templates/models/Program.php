@@ -4,6 +4,7 @@ class Program {
     private $table_name = "activities";
 
     public function __construct($db) {
+        // Use the app database connection for activities
         $this->conn = $db;
     }
 

@@ -5,7 +5,7 @@ require_once __DIR__ . '/models/Program.php';
 require_once __DIR__ . '/models/User.php';
 require_once __DIR__ . '/models/Favourite.php';
 
-$database = new Database();
+$database = new Database('kidssmart_app');
 $db = $database->getConnection();
 $program = new Program($db);
 $favourite = new Favourite($db);

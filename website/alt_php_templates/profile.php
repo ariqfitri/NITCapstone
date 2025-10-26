@@ -5,7 +5,7 @@ require_once __DIR__ . '/models/User.php';
 
 redirect_if_not_logged_in();
 
-$database = new Database();
+$database = new Database('kidssmart_users');
 $db = $database->getConnection();
 $user = new User($db);
 
