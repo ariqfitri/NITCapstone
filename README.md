@@ -170,36 +170,36 @@ Ensure `main.py` uses Docker service name:
 
 ---
 
-# Main Branch
+## Main Branch
 
-## Switch to main branch
+Switch to main branch
 `git checkout main`
 
-## Add only Flask templates and static files (example paths)
+Add only Flask templates and static files (example paths)
 `git add website/templates` <br />
 `git add website/static/css/style.css` <br />
 `git add website/static/js/main.js`
 
-## Commit changes with a clear message
+Commit changes with a clear message
 `git commit -m "Update Flask templates and static files for website"`
 
-## Push to main branch
+Push to main branch
 `git push origin main`
 
 ---
 
-# ALT BRANCH
+## ALT BRANCH
 
-## Check out the legacy branch or create if it doesn't exist
+Check out the legacy branch or create if it doesn't exist
 `git checkout -b alt_php_templates`
 
-## Add only legacy PHP-related folders/files (example path)
+Add only legacy PHP-related folders/files (example path)
 `git add website/legacy_php_templates`
 
-## Commit changes with a clear message about legacy PHP integration
+Commit changes with a clear message about legacy PHP integration
 `git commit -m "Add legacy PHP templates and assets for testing and conversion"`
 
-## Push to remote and set upstream to track branch
+Push to remote and set upstream to track branch
 `git push -u origin alt_php_templates`
 
 ---
