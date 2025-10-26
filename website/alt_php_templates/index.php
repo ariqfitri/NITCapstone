@@ -15,6 +15,11 @@ $userDb = $userDatabase->getConnection();
 // Initialize Program model with app database
 $program = new Program($appDb);
 
+// Get featured programs, categories, and suburbs
+$featured_programs = $program->getFeaturedPrograms(6);
+$categories = $program->getAllCategories();
+$suburbs = $program->getAllSuburbs();
+
 // If user is logged in, get personalised recommendations
 $recommended_programs = [];
 if (is_logged_in()) {
@@ -39,7 +44,6 @@ if (is_logged_in()) {
 <body>
     <?php include 'includes/header.php'; ?>
 
-    <!-- Rest of your existing index.php content remains the same -->
     <!-- Hero Section -->
     <section class="hero-section bg-light py-5">
         <div class="container">
