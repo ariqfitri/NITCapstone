@@ -5,9 +5,9 @@ require_once __DIR__ . '/models/Favourite.php';
 
 redirect_if_not_logged_in();
 
-$database = new Database();
-$db = $database->getConnection();
-$favourite = new Favourite($db);
+$userDatabase = new Database('kidssmart_users');
+$userDb = $userDatabase->getConnection();
+$favourite = new Favourite($userDb);
 
 $user_id = get_current_user_id();
 $favourites = $favourite->getUserFavourites($user_id);

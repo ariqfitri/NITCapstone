@@ -1,7 +1,7 @@
 <?php
 class Favourite {
     private $conn;
-    private $table_name = "php_user_favourites";
+    private $table_name = "favourites";
 
     public $favourite_id;
     public $user_id;
