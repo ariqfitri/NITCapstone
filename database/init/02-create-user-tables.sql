@@ -23,9 +23,9 @@ CREATE TABLE IF NOT EXISTS php_users (
     INDEX idx_username (username)
 );
 
--- PHP User favorites
-CREATE TABLE IF NOT EXISTS php_user_favorites (
-    favorite_id INT AUTO_INCREMENT PRIMARY KEY,
+-- PHP User favourites
+CREATE TABLE IF NOT EXISTS php_user_favourites (
+    favourite_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     activity_id INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
