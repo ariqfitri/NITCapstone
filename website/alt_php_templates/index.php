@@ -17,8 +17,8 @@ $program = new Program($appDb);
 
 // Get featured programs, categories, and suburbs
 $featured_programs = $program->getFeaturedPrograms(6);
-$categories = $program->getAllCategories();
-$suburbs = $program->getAllSuburbs();
+$categories = $program->getCategories();
+$suburbs = $program->getSuburbs();
 
 // If user is logged in, get personalised recommendations
 $recommended_programs = [];
