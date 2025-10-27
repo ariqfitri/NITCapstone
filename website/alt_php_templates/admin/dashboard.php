@@ -103,7 +103,7 @@ $recent_scraper_runs = $scraper->getRecentRuns(5);
             <span class="navbar-brand">KidsSmart Admin Dashboard</span>
             <div class="navbar-nav ms-auto">
                 <a href="../index.php" class="nav-link" target="_blank">View Site</a>
-                <a href="scrapers.php" class="nav-link">Scraper Management</a>
+                <a href="admin_scrapers.php" class="nav-link">Scraper Management</a>
                 <a href="logout.php" class="nav-link">Logout</a>
             </div>
         </div>
