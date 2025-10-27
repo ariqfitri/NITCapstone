@@ -5,7 +5,6 @@ require_once __DIR__ . '/../models/Scraper.php';
 require_once __DIR__ . '/../models/Program.php';
 
 // Check if user is admin
-session_start();
 if (!($_SESSION['admin_logged_in'] ?? false)) {
     header('Location: login.php');
     exit;
@@ -58,11 +57,11 @@ $total_activities = $program->getTotalProgramsCount();
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-    <?php include '../includes/admin_header.php'; ?>
+    <?php include 'includes/admin_header.php'; ?>
     
     <div class="container-fluid">
         <div class="row">
-            <?php include '../includes/admin_sidebar.php'; ?>
+            <?php include 'includes/admin_sidebar.php'; ?>
             
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
