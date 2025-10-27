@@ -68,9 +68,6 @@ services:
     container_name: kidssmart_php
     ports:
       - "8081:80"
-    volumes:
-      - ./website/alt_php_templates:/var/www/html
-      - ./website/static:/var/www/html/static
     depends_on:
       database:
         condition: service_healthy
