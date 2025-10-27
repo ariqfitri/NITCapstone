@@ -8,7 +8,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link <?= basename($_SERVER['PHP_SELF']) == 'scrapers.php' ? 'active' : '' ?>" href="scrapers.php">
+                <a class="nav-link <?= basename($_SERVER['PHP_SELF']) == 'admin_scrapers.php' ? 'active' : '' ?>" href="admin_scrapers.php">
                     <i class="fas fa-spider me-2"></i>
                     Scraper Management
                 </a>

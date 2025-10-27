@@ -1,9 +1,9 @@
 <?php
 // Check if user is logged in and is admin
 if (!isset($no_auth_check)) {
-    require_once __DIR__ . '/../config/auth.php';
-    if (!is_logged_in() || !is_admin()) {
-        header('Location: ../login.php');
+    session_start();
+    if (!($_SESSION['admin_logged_in'] ?? false)) {
+        header('Location: login.php');
         exit;
     }
 }
@@ -60,7 +60,7 @@ if (!isset($no_auth_check)) {
         
         <div class="navbar-nav">
             <div class="nav-item text-nowrap">
-                <a class="nav-link px-3" href="../logout.php">
+                <a class="nav-link px-3" href="logout.php">
                     <i class="fas fa-sign-out-alt me-1"></i> Sign out
                 </a>
             </div>
