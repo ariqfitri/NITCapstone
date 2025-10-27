@@ -5,8 +5,9 @@ require_once __DIR__ . '/../models/Scraper.php';
 require_once __DIR__ . '/../models/Program.php';
 
 // Check if user is admin
-if (!is_logged_in() || !is_admin()) {
-    header('Location: ../login.php');
+session_start();
+if (!($_SESSION['admin_logged_in'] ?? false)) {
+    header('Location: login.php');
     exit;
 }
 
