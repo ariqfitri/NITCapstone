@@ -54,3 +54,12 @@ INSERT IGNORE INTO categories (category_name) VALUES
     ('Education'),
     ('Before/After School Care'),
     ('Holiday Programs');
+
+-- Insert Scraper logging
+CREATE TABLE IF NOT EXISTS scraping_logs (
+    log_id INT AUTO_INCREMENT PRIMARY KEY,
+    scraper_name VARCHAR(100) NOT NULL,
+    status ENUM('started', 'completed', 'failed') NOT NULL,
+    message TEXT,
+    run_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);

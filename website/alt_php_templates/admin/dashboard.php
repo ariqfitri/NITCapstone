@@ -3,6 +3,7 @@ session_start();
 require_once '../config/database.php';
 require_once '../models/Program.php';
 require_once '../models/User.php';
+require_once '../models/Scraper.php';
 
 // Check if admin is logged in
 if (!($_SESSION['admin_logged_in'] ?? false)) {
@@ -10,29 +11,36 @@ if (!($_SESSION['admin_logged_in'] ?? false)) {
     exit;
 }
 
-$database = new Database();
-$db = $database->getConnection();
-$program = new Program($db);
-$user = new User($db);
+// Initialize dual database connections
+$appDatabase = new Database('kidssmart_app');
+$appDb = $appDatabase->getConnection();
+
+$userDatabase = new Database('kidssmart_users'); 
+$userDb = $userDatabase->getConnection();
+
+// Initialize models with correct databases
+$program = new Program($appDb);        // Uses kidssmart_app
+$user = new User($userDb);             // Uses kidssmart_users
+$scraper = new Scraper($appDb);        // Uses kidssmart_app
 
 // Handle actions
 if ($_POST['action'] ?? false) {
     $activity_id = $_POST['activity_id'] ?? 0;
     
     if ($_POST['action'] === 'approve' && $activity_id) {
-        $stmt = $db->prepare("UPDATE activities SET is_approved = 1 WHERE activity_id = ?");
+        $stmt = $appDb->prepare("UPDATE activities SET is_approved = 1 WHERE activity_id = ?");
         $stmt->execute([$activity_id]);
         $message = "Activity approved successfully!";
     } elseif ($_POST['action'] === 'reject' && $activity_id) {
-        $stmt = $db->prepare("UPDATE activities SET is_approved = 0 WHERE activity_id = ?");
+        $stmt = $appDb->prepare("UPDATE activities SET is_approved = 0 WHERE activity_id = ?");
         $stmt->execute([$activity_id]);
         $message = "Activity rejected successfully!";
     } elseif ($_POST['action'] === 'delete' && $activity_id) {
-        $stmt = $db->prepare("DELETE FROM activities WHERE activity_id = ?");
+        $stmt = $appDb->prepare("DELETE FROM activities WHERE activity_id = ?");
         $stmt->execute([$activity_id]);
         $message = "Activity deleted successfully!";
     } elseif ($_POST['action'] === 'approve_all') {
-        $stmt = $db->prepare("UPDATE activities SET is_approved = 1 WHERE is_approved = 0");
+        $stmt = $appDb->prepare("UPDATE activities SET is_approved = 1 WHERE is_approved = 0");
         $stmt->execute();
         $message = "All activities approved successfully!";
     }
@@ -54,6 +62,10 @@ $category_stats = $program->getCategoryStats();
 
 // Recent activity (last 7 days)
 $recent_activities = $program->getRecentActivities(7);
+
+// Scraper statistics
+$scraper_stats = $scraper->getScraperStats();
+$recent_scraper_runs = $scraper->getRecentRuns(5);
 ?>
 
 <!DOCTYPE html>
@@ -91,6 +103,7 @@ $recent_activities = $program->getRecentActivities(7);
             <span class="navbar-brand">KidsSmart Admin Dashboard</span>
             <div class="navbar-nav ms-auto">
                 <a href="../index.php" class="nav-link" target="_blank">View Site</a>
+                <a href="admin_scrapers.php" class="nav-link">Scraper Management</a>
                 <a href="logout.php" class="nav-link">Logout</a>
             </div>
         </div>
@@ -151,11 +164,11 @@ $recent_activities = $program->getRecentActivities(7);
                 </div>
             </div>
             <div class="col-md-3 mb-3">
-                <div class="card stat-card text-white bg-warning">
+                <div class="card stat-card text-white bg-secondary">
                     <div class="card-body">
-                        <div class="metric-value"><?= count($recent_activities) ?></div>
-                        <div class="metric-label">Recent Activities</div>
-                        <small>Last 7 days</small>
+                        <div class="metric-value"><?= count($scraper_stats) ?></div>
+                        <div class="metric-label">Data Sources</div>
+                        <small>Scraper sources</small>
                     </div>
                 </div>
             </div>
@@ -197,6 +210,44 @@ $recent_activities = $program->getRecentActivities(7);
                         </div>
                     </div>
                 </div>
+
+                <!-- Scraper Statistics -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Scraper Statistics</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <?php if ($scraper_stats): ?>
+                                <?php foreach ($scraper_stats as $stat): ?>
+                                    <div class="col-md-6 mb-3">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <h6 class="card-title"><?= htmlspecialchars($stat['source_name']) ?></h6>
+                                                    <span class="badge bg-primary"><?= $stat['count'] ?></span>
+                                                </div>
+                                                <p class="card-text">
+                                                    <small class="text-muted">
+                                                        <?php if ($stat['last_scraped']): ?>
+                                                            Last run: <?= date('M j, g:i A', strtotime($stat['last_scraped'])) ?>
+                                                        <?php else: ?>
+                                                            Never run
+                                                        <?php endif; ?>
+                                                    </small>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <div class="col-12">
+                                    <p class="text-muted">No scraper data available</p>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Right Column -->
@@ -227,6 +278,41 @@ $recent_activities = $program->getRecentActivities(7);
                     </div>
                 </div>
 
+                <!-- Recent Scraper Runs -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Recent Scraper Runs</h5>
+                    </div>
+                    <div class="card-body">
+                        <?php if (count($recent_scraper_runs) > 0): ?>
+                            <div class="list-group list-group-flush">
+                                <?php foreach ($recent_scraper_runs as $run): ?>
+                                    <div class="list-group-item">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span class="badge bg-secondary"><?= htmlspecialchars($run['scraper_name']) ?></span>
+                                            <?php 
+                                            $status_class = [
+                                                'started' => 'warning',
+                                                'completed' => 'success', 
+                                                'failed' => 'danger'
+                                            ][$run['status']] ?? 'secondary';
+                                            ?>
+                                            <span class="badge bg-<?= $status_class ?>">
+                                                <?= htmlspecialchars($run['status']) ?>
+                                            </span>
+                                        </div>
+                                        <small class="text-muted">
+                                            <?= date('M j, g:i A', strtotime($run['run_at'])) ?>
+                                        </small>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php else: ?>
+                            <p class="text-muted">No recent scraper runs</p>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
                 <!-- Quick Actions -->
                 <div class="card">
                     <div class="card-header">
@@ -237,11 +323,11 @@ $recent_activities = $program->getRecentActivities(7);
                             <a href="#pending-activities" class="btn btn-warning">
                                 <i class="fas fa-clock"></i> Review Pending (<?= $total_pending ?>)
                             </a>
+                            <a href="admin_scrapers.php" class="btn btn-outline-secondary">
+                                <i class="fas fa-spider"></i> Manage Scrapers
+                            </a>
                             <a href="../search.php" class="btn btn-outline-primary" target="_blank">
                                 <i class="fas fa-search"></i> View Public Site
-                            </a>
-                            <a href="?export=csv" class="btn btn-outline-success">
-                                <i class="fas fa-download"></i> Export Data
                             </a>
                         </div>
                     </div>

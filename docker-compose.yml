@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   database:
     image: mysql:8.0
@@ -70,7 +68,6 @@ services:
       - "8081:80"
     volumes:
       - ./website/alt_php_templates:/var/www/html
-      - ./website/static:/var/www/html/static
     depends_on:
       database:
         condition: service_healthy
