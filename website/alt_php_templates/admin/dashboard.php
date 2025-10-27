@@ -323,7 +323,7 @@ $recent_scraper_runs = $scraper->getRecentRuns(5);
                             <a href="#pending-activities" class="btn btn-warning">
                                 <i class="fas fa-clock"></i> Review Pending (<?= $total_pending ?>)
                             </a>
-                            <a href="scrapers.php" class="btn btn-outline-secondary">
+                            <a href="admin_scrapers.php" class="btn btn-outline-secondary">
                                 <i class="fas fa-spider"></i> Manage Scrapers
                             </a>
                             <a href="../search.php" class="btn btn-outline-primary" target="_blank">
