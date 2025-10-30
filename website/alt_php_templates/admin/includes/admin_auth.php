@@ -1,11 +1,11 @@
 <?php
 /**
  * Admin Authentication Helper
- * Simple helper functions for admin panel authentication
+ * Fixed version to prevent session header warnings
  */
 
-// Only start session if one hasn't been started already
-if (session_status() === PHP_SESSION_NONE) {
+// Only start session if one hasn't been started already AND no output has been sent
+if (session_status() === PHP_SESSION_NONE && !headers_sent()) {
     session_start();
 }
 
@@ -50,5 +50,4 @@ function get_admin_flash_message() {
     }
     return null;
 }
-
 ?>
