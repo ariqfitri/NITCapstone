@@ -197,5 +197,174 @@ class User {
         return $login_success;
     }
 
+    // Get new users today
+    public function getNewUsersToday() {
+        try {
+            $query = "SELECT COUNT(*) as count FROM " . $this->table_name . " 
+                     WHERE DATE(created_at) = CURDATE()";
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute();
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $result['count'] ?? 0;
+        } catch (PDOException $e) {
+            error_log("Error getting new users today: " . $e->getMessage());
+            return 0;
+        }
+    }
+
+    // Get active users today
+    public function getActiveUsersToday() {
+        try {
+            $query = "SELECT COUNT(*) as count FROM " . $this->table_name . " 
+                     WHERE is_active = 1";
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute();
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $result['count'] ?? 0;
+        } catch (PDOException $e) {
+            error_log("Error getting active users: " . $e->getMessage());
+            return 0;
+        }
+    }
+
+    // Get active users this week (with activity tracking)
+    public function getActiveUsersThisWeek() {
+        try {
+            // Try to get from activity logs first, fallback to all active users
+            $query = "SELECT COUNT(DISTINCT user_id) as count 
+                     FROM user_activity_logs 
+                     WHERE activity_time >= DATE_SUB(NOW(), INTERVAL 7 DAY)";
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute();
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($result['count'] > 0) {
+                return $result['count'];
+            }
+            
+            // Fallback to active users if activity table doesn't exist
+            return $this->getActiveUsersToday();
+        } catch (PDOException $e) {
+            // Fallback to active users count
+            return $this->getActiveUsersToday();
+        }
+    }
+
+    // Get user growth statistics
+    public function getUserGrowthStats() {
+        try {
+            $query = "SELECT 
+                DATE(created_at) as date,
+                COUNT(*) as new_users
+                FROM " . $this->table_name . " 
+                WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+                GROUP BY DATE(created_at)
+                ORDER BY date ASC";
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error getting user growth stats: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    // Get user by email (for admin purposes)
+    public function getUserByEmail($email) {
+        try {
+            $query = "SELECT * FROM " . $this->table_name . " WHERE email = ? LIMIT 1";
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute([$email]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error getting user by email: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    // Get user engagement metrics
+    public function getUserEngagement($user_id) {
+        try {
+            $metrics = [];
+            
+            // Get favorites count
+            try {
+                $query = "SELECT COUNT(*) as count FROM favourites WHERE user_id = ?";
+                $stmt = $this->conn->prepare($query);
+                $stmt->execute([$user_id]);
+                $metrics['favorites'] = $stmt->fetch(PDO::FETCH_ASSOC)['count'] ?? 0;
+            } catch (PDOException $e) {
+                $metrics['favorites'] = 0;
+            }
+            
+            // Get reviews count
+            try {
+                $query = "SELECT COUNT(*) as count FROM reviews WHERE user_id = ?";
+                $stmt = $this->conn->prepare($query);
+                $stmt->execute([$user_id]);
+                $metrics['reviews'] = $stmt->fetch(PDO::FETCH_ASSOC)['count'] ?? 0;
+            } catch (PDOException $e) {
+                $metrics['reviews'] = 0;
+            }
+            
+            // Get search history count
+            try {
+                $query = "SELECT COUNT(*) as count FROM search_logs WHERE user_id = ?";
+                $stmt = $this->conn->prepare($query);
+                $stmt->execute([$user_id]);
+                $metrics['searches'] = $stmt->fetch(PDO::FETCH_ASSOC)['count'] ?? 0;
+            } catch (PDOException $e) {
+                $metrics['searches'] = 0;
+            }
+            
+            return $metrics;
+        } catch (PDOException $e) {
+            return ['favorites' => 0, 'reviews' => 0, 'searches' => 0];
+        }
+    }
+
+    // Update user last login
+    public function updateLastLogin($user_id) {
+        try {
+            $query = "UPDATE " . $this->table_name . " SET last_login = NOW() WHERE user_id = ?";
+            $stmt = $this->conn->prepare($query);
+            return $stmt->execute([$user_id]);
+        } catch (PDOException $e) {
+            error_log("Error updating last login: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    // Log user activity (for tracking)
+    public function logActivity($user_id, $activity_type, $activity_data = null) {
+        try {
+            $query = "INSERT INTO user_activity_logs (user_id, activity_type, activity_data, activity_time) 
+                     VALUES (?, ?, ?, NOW())";
+            $stmt = $this->conn->prepare($query);
+            return $stmt->execute([$user_id, $activity_type, json_encode($activity_data)]);
+        } catch (PDOException $e) {
+            // Table might not exist, ignore silently
+            return false;
+        }
+    }
+
+    // Get user statistics for admin
+    public function getUserStats($user_id) {
+        try {
+            $query = "SELECT 
+                u.*,
+                (SELECT COUNT(*) FROM favourites f WHERE f.user_id = u.user_id) as favorite_count,
+                (SELECT COUNT(*) FROM reviews r WHERE r.user_id = u.user_id) as review_count
+                FROM " . $this->table_name . " u
+                WHERE u.user_id = ?";
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute([$user_id]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error getting user stats: " . $e->getMessage());
+            return false;
+        }
+    }
+
 }
 ?>
