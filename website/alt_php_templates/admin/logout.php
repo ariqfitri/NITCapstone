@@ -1,6 +1,6 @@
 <?php
-session_start();
-session_destroy();
-header('Location: login.php');
-exit;
+require_once __DIR__ . '/includes/admin_auth.php';
+
+// Use the admin logout function
+admin_logout();
 ?>
