@@ -5,9 +5,15 @@ require_once __DIR__ . '/models/Program.php';
 require_once __DIR__ . '/models/User.php';
 require_once __DIR__ . '/models/Favourite.php';
 
-$database = new Database('kidssmart_app');
-$db = $database->getConnection();
-$program = new Program($db);
+// Initialize database connections
+$appDatabase = new Database('kidssmart_app');
+$appDb = $appDatabase->getConnection();
+
+$userDatabase = new Database('kidssmart_users'); // ✅ FIXED! Use users database for favourites
+$userDb = $userDatabase->getConnection();
+
+// Initialize models with correct databases
+$program = new Program($appDb);
 
 // Get search parameters
 $search = $_GET['search'] ?? '';
@@ -26,7 +32,7 @@ $total_results = $program->getSearchCount($search, $category, $suburb);
 $total_pages = ceil($total_results / $limit);
 
 // Check favourites for logged-in users
-$favourite = new Favourite($db);
+$favourite = new Favourite($userDb); // ✅ FIXED! Use users database connection
 if (is_logged_in()) {
     $user_favourites = [];
     foreach ($programs as $activity) {

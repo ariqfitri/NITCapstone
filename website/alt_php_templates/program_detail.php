@@ -5,10 +5,16 @@ require_once __DIR__ . '/models/Program.php';
 require_once __DIR__ . '/models/User.php';
 require_once __DIR__ . '/models/Favourite.php';
 
-$database = new Database('kidssmart_app');
-$db = $database->getConnection();
-$program = new Program($db);
-$favourite = new Favourite($db);
+// Initialize database connections
+$appDatabase = new Database('kidssmart_app');
+$appDb = $appDatabase->getConnection();
+
+$userDatabase = new Database('kidssmart_users'); // ✅ CORRECT! Use users database for favourites
+$userDb = $userDatabase->getConnection();
+
+// Initialize models with correct databases
+$program = new Program($appDb);
+$favourite = new Favourite($userDb); // ✅ FIXED! Use users database connection
 
 // Handle favourite actions
 if (is_logged_in() && ($_POST['favourite_action'] ?? false)) {

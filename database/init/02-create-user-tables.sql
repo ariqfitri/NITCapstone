@@ -24,15 +24,18 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 -- PHP User favourites
-CREATE TABLE IF NOT EXISTS favourites (
+CREATE TABLE favourites (
     favourite_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     activity_id INT NOT NULL,
+    activity_title VARCHAR(255) NOT NULL,
+    activity_url VARCHAR(500) NOT NULL,
+    activity_image VARCHAR(500),
+    activity_age_range VARCHAR(50),
+    activity_category VARCHAR(100),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-    UNIQUE KEY unique_user_activity (user_id, activity_id),
-    INDEX idx_user_id (user_id),
-    INDEX idx_activity_id (activity_id)
+    UNIQUE KEY unique_user_activity (user_id, activity_id)
 );
 
 -- PHP User reviews
@@ -61,3 +64,7 @@ CREATE TABLE IF NOT EXISTS sessions (
     INDEX idx_user_id (user_id),
     INDEX idx_expires (expires_at)
 );
+
+-- Add indexes for better performance
+CREATE INDEX idx_user_id ON favourites(user_id);
+CREATE INDEX idx_activity_id ON favourites(activity_id);

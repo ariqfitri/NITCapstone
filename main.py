@@ -27,11 +27,10 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 
 # Initialize the shared db instance with the app
-#db.init_app(app)
-db = SQLAlchemy(app)
+db.init_app(app)
 
 # ============================================================================
-# USER DATABASE MODELS
+# USER DATABASE MODELS (kidssmart_users)
 # ============================================================================
 
 class User(db.Model):
@@ -41,16 +40,26 @@ class User(db.Model):
     email = db.Column(db.String(255), unique=True, nullable=False)
     username = db.Column(db.String(255), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
+    first_name = db.Column(db.String(100))
+    last_name = db.Column(db.String(100))
+    suburb = db.Column(db.String(100))
+    postcode = db.Column(db.String(10))
+    child_age_range = db.Column(db.String(50))
+    preferences = db.Column(db.JSON)  # ✅ FIXED: Added missing field
     is_verified = db.Column(db.Boolean, default=False)
     is_active = db.Column(db.Boolean, default=True)
     is_admin = db.Column(db.Boolean, default=False)
+    verification_token = db.Column(db.String(100))  # ✅ FIXED: Added missing field
+    reset_token = db.Column(db.String(100))  # ✅ FIXED: Added missing field
+    reset_expires = db.Column(db.DateTime)  # ✅ FIXED: Added missing field
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)  # ✅ FIXED: Added missing field
     last_login = db.Column(db.DateTime, nullable=True)
     
-    # Relationships
-    profile = db.relationship('UserProfile', backref='user', uselist=False, cascade='all, delete-orphan')
-    favorites = db.relationship('UserFavorite', backref='user', cascade='all, delete-orphan')
+    # ✅ FIXED: Updated relationships to match PHP schema
+    favourites = db.relationship('UserFavorite', backref='user', cascade='all, delete-orphan')
     reviews = db.relationship('UserReview', backref='user', cascade='all, delete-orphan')
+    sessions = db.relationship('UserSession', backref='user', cascade='all, delete-orphan')  # ✅ NEW
     
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -59,42 +68,45 @@ class User(db.Model):
         return check_password_hash(self.password_hash, password)
 
 
-class UserProfile(db.Model):
-    __tablename__ = 'user_profiles'
-    
-    profile_id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
-    first_name = db.Column(db.String(100))
-    last_name = db.Column(db.String(100))
-    suburb = db.Column(db.String(100))
-    postcode = db.Column(db.String(10))
-    phone = db.Column(db.String(20))
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-
-
 class UserFavorite(db.Model):
-    __tablename__ = 'user_favorites'
+    __tablename__ = 'favourites'  # ✅ FIXED: Match PHP table name
     
-    favorite_id = db.Column(db.Integer, primary_key=True)
+    favourite_id = db.Column(db.Integer, primary_key=True)  # ✅ FIXED: Match PHP field name
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
     activity_id = db.Column(db.Integer, nullable=False)  # Links to activities table in app_data DB
+    activity_title = db.Column(db.String(255), nullable=False)  # ✅ FIXED: Added missing field
+    activity_url = db.Column(db.String(500), nullable=False)  # ✅ FIXED: Added missing field
+    activity_image = db.Column(db.String(500))  # ✅ FIXED: Added missing field
+    activity_age_range = db.Column(db.String(50))  # ✅ FIXED: Added missing field
+    activity_category = db.Column(db.String(100))  # ✅ FIXED: Added missing field
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 
 class UserReview(db.Model):
-    __tablename__ = 'user_reviews'
+    __tablename__ = 'reviews'  # ✅ FIXED: Match PHP table name
     
     review_id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
     activity_id = db.Column(db.Integer, nullable=False)  # Links to activities table in app_data DB
     rating = db.Column(db.Integer, nullable=False)  # 1-5
     review_text = db.Column(db.Text)
+    is_approved = db.Column(db.Boolean, default=True)  # ✅ FIXED: Added missing field
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 
+# ✅ NEW: Add UserSession model to match PHP schema
+class UserSession(db.Model):
+    __tablename__ = 'sessions'
+    
+    session_id = db.Column(db.String(128), primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    expires_at = db.Column(db.DateTime, nullable=False)
+
+
 # ============================================================================
-# APP DATA MODELS (activities only)
+# APP DATA MODELS (kidssmart_app)
 # ============================================================================
 
 class Activity(db.Model):
@@ -141,130 +153,124 @@ class Location(db.Model):
     state = db.Column(db.String(50))
 
 
+# ✅ NEW: Add ScrapingLog model to match schema
+class ScrapingLog(db.Model):
+    __bind_key__ = 'app_data'
+    __tablename__ = 'scraping_logs'
+    
+    log_id = db.Column(db.Integer, primary_key=True)
+    scraper_name = db.Column(db.String(100), nullable=False)
+    status = db.Column(db.Enum('started', 'completed', 'failed'), nullable=False)
+    message = db.Column(db.Text)
+    run_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
 # ============================================================================
-# ROUTES (activities only)
+# API ROUTES
 # ============================================================================
 
-@app.route('/')
-def index():
-    """Homepage with activities"""
-    activities = Activity.query.filter_by(is_approved=True).limit(20).all()
-    return render_template('index.html', activities=activities)
+@app.route('/api/status')
+def api_status():
+    """API endpoint to check Flask app status"""
+    return jsonify({
+        'status': 'running',
+        'message': 'Flask API is operational',
+        'timestamp': datetime.utcnow().isoformat()
+    })
 
 
-@app.route('/activities')
-def activities():
-    """Activities listing with filters"""
-    category = request.args.get('category')
-    suburb = request.args.get('suburb')
-    source = request.args.get('source')  # NEW: Filter by source
-    
-    query = Activity.query.filter_by(is_approved=True)
-    
-    if category:
-        query = query.filter_by(category=category)
-    if suburb:
-        query = query.filter_by(suburb=suburb)
-    if source:
-        query = query.filter_by(source_name=source)
-    
-    activities = query.all()
-    categories = db.session.execute(
-        db.select(Category.category_name).bind_mapper(Category)
-    ).scalars().all()
-    
-    return render_template('activities.html', activities=activities, categories=categories)
+@app.route('/api/activities')
+def api_activities():
+    """API endpoint for activities - used by PHP frontend"""
+    try:
+        page = request.args.get('page', 1, type=int)
+        limit = request.args.get('limit', 12, type=int)
+        category = request.args.get('category', '')
+        suburb = request.args.get('suburb', '')
+        search = request.args.get('search', '')
+        
+        query = Activity.query.filter_by(is_approved=True)
+        
+        if category:
+            query = query.filter_by(category=category)
+        if suburb:
+            query = query.filter_by(suburb=suburb)
+        if search:
+            query = query.filter(
+                db.or_(
+                    Activity.title.contains(search),
+                    Activity.description.contains(search)
+                )
+            )
+        
+        total = query.count()
+        activities = query.paginate(
+            page=page, 
+            per_page=limit, 
+            error_out=False
+        ).items
+        
+        return jsonify({
+            'activities': [{
+                'activity_id': a.activity_id,
+                'title': a.title,
+                'description': a.description,
+                'category': a.category,
+                'suburb': a.suburb,
+                'postcode': a.postcode,
+                'image_url': a.image_url,
+                'age_range': a.age_range,
+                'cost': a.cost
+            } for a in activities],
+            'total': total,
+            'page': page,
+            'limit': limit
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
-@app.route('/activity/<int:activity_id>')
-def activity_detail(activity_id):
-    """Activity details with reviews"""
-    activity = Activity.query.get_or_404(activity_id)
-    
-    # Get reviews for this activity
-    reviews = UserReview.query.filter_by(activity_id=activity_id).all()
-    
-    return render_template('activity_detail.html', activity=activity, reviews=reviews)
+@app.route('/api/activity/<int:activity_id>')
+def api_activity_detail(activity_id):
+    """API endpoint for single activity details"""
+    try:
+        activity = Activity.query.filter_by(
+            activity_id=activity_id, 
+            is_approved=True
+        ).first_or_404()
+        
+        return jsonify({
+            'activity_id': activity.activity_id,
+            'title': activity.title,
+            'description': activity.description,
+            'category': activity.category,
+            'suburb': activity.suburb,
+            'postcode': activity.postcode,
+            'address': activity.address,
+            'phone': activity.phone,
+            'email': activity.email,
+            'website': activity.website,
+            'age_range': activity.age_range,
+            'cost': activity.cost,
+            'schedule': activity.schedule,
+            'image_url': activity.image_url,
+            'source_name': activity.source_name,
+            'scraped_at': activity.scraped_at.isoformat() if activity.scraped_at else None
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    """User registration"""
-    if request.method == 'POST':
-        email = request.form.get('email')
-        password = request.form.get('password')
-        first_name = request.form.get('first_name')
-        last_name = request.form.get('last_name')
 
-        # Check if user exists
-        existing_user = User.query.filter_by(email=email).first()
-        if existing_user:
-            flash('Email already registered', 'error')
-            return redirect(url_for('register'))
+# ✅ REMOVED: All user-facing routes that conflict with PHP
+# The PHP application handles:
+# - / (homepage)
+# - /activities (activity listing)
+# - /activity/<id> (activity details)
+# - User registration, login, profiles
+# - Favourites management
 
-        # Create new user
-        new_user = User(email=email)
-        new_user.set_password(password)
-        db.session.add(new_user)
-        db.session.flush()  # Get user_id before committing
+# ✅ KEEP: Flask only handles API endpoints and admin functions
 
-        # Create profile
-        profile = UserProfile(
-            user_id=new_user.user_id,
-            first_name=first_name,
-            last_name=last_name
-        )
-        db.session.add(profile)
-        db.session.commit()
-
-        flash('Registration successful! Please login.', 'success')
-        return redirect(url_for('login'))
-
-    return render_template('register.html')
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    """User login"""
-    if request.method == 'POST':
-        email = request.form.get('email')
-        password = request.form.get('password')
-
-        user = User.query.filter_by(email=email).first()
-
-        if user and user.check_password(password):
-            # Update last login
-            user.last_login = datetime.utcnow()
-            db.session.commit()
-
-            # Set session
-            session['user_id'] = user.user_id
-            session['email'] = user.email
-            flash('Login successful!', 'success')
-            return redirect(url_for('dashboard'))
-        else:
-            flash('Invalid email or password', 'error')
-            return redirect(url_for('login'))
-
-    return render_template('login.html')
-
-@app.route('/dashboard')
-def dashboard():
-    """User dashboard"""
-    if 'user_id' not in session:
-        flash('Please login first', 'error')
-        return redirect(url_for('login'))
-
-    user = User.query.get(session['user_id'])
-    favorites = UserFavorite.query.filter_by(user_id=user.user_id).all()
-    reviews = UserReview.query.filter_by(user_id=user.user_id).all()
-
-    return render_template('dashboard.html', user=user, favorites=favorites, reviews=reviews)
-
-@app.route('/logout')
-def logout():
-    """User logout"""
-    session.clear()
-    flash('You have been logged out', 'success')
-    return redirect(url_for('index'))
 
 if __name__ == '__main__':
     with app.app_context():

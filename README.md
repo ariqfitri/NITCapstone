@@ -170,39 +170,5 @@ Ensure `main.py` uses Docker service name:
 
 ---
 
-## Main Branch
-
-Switch to main branch <br />
-`git checkout main`
-
-Add only Flask templates and static files (example paths) <br />
-`git add website/templates` <br />
-`git add website/static/css/style.css` <br />
-`git add website/static/js/main.js`
-
-Commit changes with a clear message <br />
-`git commit -m "Update Flask templates and static files for website"`
-
-Push to main branch <br />
-`git push origin main`
-
----
-
-## ALT BRANCH
-
-Check out the legacy branch or create if it doesn't exist <br />
-`git checkout -b alt_php_templates`
-
-Add only legacy PHP-related folders/files (example path) <br />
-`git add website/legacy_php_templates`
-
-Commit changes with a clear message about legacy PHP integration <br />
-`git commit -m "Add legacy PHP templates and assets for testing and conversion"`
-
-Push to remote and set upstream to track branch <br />
-`git push -u origin alt_php_templates`
-
----
-
 This README provides clear instructions to set up and run the KidsSmart application in Docker across popular OS platforms, ensuring a consistent development environment.
 
