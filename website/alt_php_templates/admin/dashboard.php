@@ -264,16 +264,16 @@ $page_views_week = rand(300, 1500);
                     <!-- Key Metrics -->
                     <div class="row mb-4">
                         <div class="col-xl-3 col-md-6 mb-3">
-                            <div class="card metric-card border-0 bg-gradient" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                                <div class="card-body text-white">
+                            <div class="card metric-card border shadow-sm">
+                                <div class="card-body bg-primary text-white">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
-                                            <h6 class="fw-bold mb-1 opacity-75">Total Activities</h6>
-                                            <h2 class="mb-0"><?= number_format($stats['total_activities']) ?></h2>
-                                            <small class="opacity-75">Approved: <?= number_format($stats['approved_activities']) ?></small>
+                                            <h6 class="fw-bold mb-1" style="color: white !important;">Total Activities</h6>
+                                            <h2 class="mb-0" style="color: white !important;"><?= number_format($stats['total_activities']) ?></h2>
+                                            <small style="color: rgba(255,255,255,0.8) !important;">Approved: <?= number_format($stats['approved_activities']) ?></small>
                                         </div>
-                                        <div class="opacity-75">
-                                            <i class="fas fa-running fa-2x"></i>
+                                        <div>
+                                            <i class="fas fa-running fa-2x" style="color: rgba(255,255,255,0.8) !important;"></i>
                                         </div>
                                     </div>
                                 </div>
@@ -281,16 +281,16 @@ $page_views_week = rand(300, 1500);
                         </div>
 
                         <div class="col-xl-3 col-md-6 mb-3">
-                            <div class="card metric-card border-0 bg-gradient" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-                                <div class="card-body text-white">
+                            <div class="card metric-card border shadow-sm">
+                                <div class="card-body bg-success text-white">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
-                                            <h6 class="fw-bold mb-1 opacity-75">Total Users</h6>
-                                            <h2 class="mb-0"><?= number_format($stats['total_users']) ?></h2>
-                                            <small class="opacity-75">New today: <?= number_format($stats['new_users_today']) ?></small>
+                                            <h6 class="fw-bold mb-1" style="color: white !important;">Total Users</h6>
+                                            <h2 class="mb-0" style="color: white !important;"><?= number_format($stats['total_users']) ?></h2>
+                                            <small style="color: rgba(255,255,255,0.8) !important;">New today: <?= number_format($stats['new_users_today']) ?></small>
                                         </div>
-                                        <div class="opacity-75">
-                                            <i class="fas fa-users fa-2x"></i>
+                                        <div>
+                                            <i class="fas fa-users fa-2x" style="color: rgba(255,255,255,0.8) !important;"></i>
                                         </div>
                                     </div>
                                 </div>
@@ -298,16 +298,16 @@ $page_views_week = rand(300, 1500);
                         </div>
 
                         <div class="col-xl-3 col-md-6 mb-3">
-                            <div class="card metric-card border-0 bg-gradient" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
-                                <div class="card-body text-white">
+                            <div class="card metric-card border shadow-sm">
+                                <div class="card-body bg-warning text-white">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
-                                            <h6 class="fw-bold mb-1 opacity-75">Pending Review</h6>
-                                            <h2 class="mb-0"><?= number_format($stats['pending_activities']) ?></h2>
-                                            <small class="opacity-75">Need approval</small>
+                                            <h6 class="fw-bold mb-1" style="color: white !important;">Pending Review</h6>
+                                            <h2 class="mb-0" style="color: white !important;"><?= number_format($stats['pending_activities']) ?></h2>
+                                            <small style="color: rgba(255,255,255,0.8) !important;">Need approval</small>
                                         </div>
-                                        <div class="opacity-75">
-                                            <i class="fas fa-clock fa-2x"></i>
+                                        <div>
+                                            <i class="fas fa-clock fa-2x" style="color: rgba(255,255,255,0.8) !important;"></i>
                                         </div>
                                     </div>
                                 </div>
@@ -315,16 +315,16 @@ $page_views_week = rand(300, 1500);
                         </div>
 
                         <div class="col-xl-3 col-md-6 mb-3">
-                            <div class="card metric-card border-0 bg-gradient" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
-                                <div class="card-body text-white">
+                            <div class="card metric-card border shadow-sm">
+                                <div class="card-body bg-info text-white">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
-                                            <h6 class="fw-bold mb-1 opacity-75">Page Views Today</h6>
-                                            <h2 class="mb-0"><?= number_format($page_views_today) ?></h2>
-                                            <small class="opacity-75">Week: <?= number_format($page_views_week) ?></small>
+                                            <h6 class="fw-bold mb-1" style="color: white !important;">Page Views Today</h6>
+                                            <h2 class="mb-0" style="color: white !important;"><?= number_format($page_views_today) ?></h2>
+                                            <small style="color: rgba(255,255,255,0.8) !important;">Week: <?= number_format($page_views_week) ?></small>
                                         </div>
-                                        <div class="opacity-75">
-                                            <i class="fas fa-chart-line fa-2x"></i>
+                                        <div>
+                                            <i class="fas fa-chart-line fa-2x" style="color: rgba(255,255,255,0.8) !important;"></i>
                                         </div>
                                     </div>
                                 </div>
