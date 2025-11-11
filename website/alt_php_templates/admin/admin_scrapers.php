@@ -22,7 +22,7 @@ if (isset($_POST['run_scraper'])) {
     $scraper_name = $_POST['run_scraper'];
     
     // Validate scraper name
-    $allowed_scrapers = ['activities', 'kidsbook'];
+    $allowed_scrapers = ['activities', 'kidsbook', 'serpapi'];
     if (!in_array($scraper_name, $allowed_scrapers)) {
         $_SESSION['flash_message'] = "Invalid scraper name";
         header('Location: admin_scrapers.php');
@@ -186,7 +186,7 @@ try {
                                     <button type="submit" name="run_scraper" value="activities" 
                                             class="btn btn-primary btn-lg scraper-btn"
                                             onclick="startScraper(this, 'Activities')">
-                                        <i class="fas fa-play me-2"></i>
+                                        <i class="fas fa-spider me-2"></i>
                                         Run Activities Spider
                                         <small class="d-block">Scrapes activeactivities.com.au</small>
                                     </button>
@@ -197,6 +197,14 @@ try {
                                         <i class="fas fa-spider me-2"></i>
                                         Run KidsBook Spider
                                         <small class="d-block">Scrapes kidsbook.com.au</small>
+                                    </button>
+                                    
+                                    <button type="submit" name="run_scraper" value="serpapi" 
+                                            class="btn btn-warning btn-lg scraper-btn"
+                                            onclick="startScraper(this, 'SerpAPI')">
+                                        <i class="fas fa-spider me-2"></i>
+                                        Run SerpAPI Spider
+                                        <small class="d-block">Scrapes Google Maps via SerpAPI</small>
                                     </button>
                                 </form>
                                 
