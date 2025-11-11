@@ -118,8 +118,8 @@ class MySQLActivityPipeline:
             self.cursor.execute("""
                 INSERT INTO activities (
                     title, description, category, suburb, postcode, address,
-                    phone, email, website, source_url, source_name, scraped_at
-                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    phone, email, website, image_url, source_url, source_name, scraped_at
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """, (
                 item.get('title'),
                 item.get('description'),
@@ -130,6 +130,7 @@ class MySQLActivityPipeline:
                 item.get('phone'),
                 item.get('email'),
                 item.get('website'),
+                item.get('image_url'),
                 item.get('source_url'),
                 spider.name,
                 datetime.now()
