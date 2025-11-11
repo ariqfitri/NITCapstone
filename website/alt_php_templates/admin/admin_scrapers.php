@@ -39,12 +39,15 @@ if (isset($_POST['run_scraper'])) {
     // Get the project directory (assuming we're in /var/www/html/admin)
     $project_dir = '/var/www/html';
     
-    // Build the docker command with proper escaping
+    // Build the docker command with proper escaping and ALL environment variables
     $command = 'docker run --rm --network nitcapstone_kidssmart_network ' .
                '--env DB_HOST=database ' .
                '--env DB_NAME=kidssmart_app ' .
                '--env DB_USER=app_user ' .
                '--env "DB_PASSWORD=AppPass123!" ' .
+               '--env SCRAPER_USER=scraper_user ' .
+               '--env SCRAPER_PASSWORD=ScraperPass123! ' .
+               '--env SERPAPI_API_KEY=3b69970f0cee6aa9ca862bf2aaa7a4e866876f3b979349c18753fb93ccf57033 ' .
                'nitcapstone-scraper bash -c "cd /app/kidssmart && scrapy crawl ' . 
                escapeshellarg($scraper_name) . '" 2>&1';
     

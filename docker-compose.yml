@@ -91,9 +91,9 @@ services:
         condition: service_healthy
     environment:
       DB_HOST: database
-      DB_NAME: ${DB_NAME_APP}
-      DB_USER: ${SCRAPER_USER}
-      DB_PASSWORD: ${SCRAPER_PASSWORD}
+      DB_NAME: ${DB_NAME_APP:-kidssmart_app}
+      DB_USER: ${SCRAPER_USER:-scraper_user}
+      DB_PASSWORD: ${SCRAPER_PASSWORD:-ScraperPass123!}
       SERPAPI_API_KEY: ${SERPAPI_API_KEY}
     volumes:
       - ./kidssmart:/app/kidssmart
