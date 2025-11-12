@@ -97,36 +97,6 @@ require_once 'config/auth.php';
             <p class="lead text-muted">Navigate KidsSmart with ease - find everything you need</p>
         </div>
 
-        <!-- Quick Stats -->
-        <div class="stats-grid">
-            <div class="row">
-                <div class="col-md-3">
-                    <div class="stat-item">
-                        <span class="stat-number">8</span>
-                        <small>Main Pages</small>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="stat-item">
-                        <span class="stat-number">1000+</span>
-                        <small>Activities Listed</small>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="stat-item">
-                        <span class="stat-number">15+</span>
-                        <small>Activity Categories</small>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="stat-item">
-                        <span class="stat-number">100+</span>
-                        <small>Trusted Providers</small>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <div class="row">
             <div class="col-lg-6">
                 <!-- Main Pages -->
