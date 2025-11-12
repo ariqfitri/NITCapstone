@@ -102,8 +102,8 @@ require_once 'config/auth.php';
             <div class="row">
                 <div class="col-md-3">
                     <div class="stat-item">
-                        <span class="stat-number">50+</span>
-                        <small>Pages & Features</small>
+                        <span class="stat-number">8</span>
+                        <small>Main Pages</small>
                     </div>
                 </div>
                 <div class="col-md-3">
@@ -148,10 +148,6 @@ require_once 'config/auth.php';
                         <strong>About Us</strong>
                         <div class="page-description">Learn about KidsSmart and our mission</div>
                     </a>
-                    <a href="contact.php" class="page-link">
-                        <strong>Contact</strong>
-                        <div class="page-description">Get in touch with our support team</div>
-                    </a>
                 </div>
 
                 <!-- User Account Pages -->
@@ -181,74 +177,16 @@ require_once 'config/auth.php';
                         </a>
                         <a href="signup.php" class="page-link">
                             <strong>Sign Up</strong>
-                            <div class="page-description">Create a new account (free)</div>
-                        </a>
-                        <a href="forgot-password.php" class="page-link">
-                            <strong>Forgot Password</strong>
-                            <div class="page-description">Reset your account password</div>
+                            <div class="page-description">Create a new KidsSmart account</div>
                         </a>
                     <?php endif; ?>
-                </div>
-
-                <!-- Activity Categories -->
-                <div class="sitemap-section">
-                    <h3><i class="fas fa-list text-primary me-2"></i>Activity Categories</h3>
-                    <a href="categories.php?cat=swimming" class="page-link">
-                        <strong>Swimming & Water Sports</strong>
-                        <div class="page-description">Swimming lessons, water safety, diving programs</div>
-                    </a>
-                    <a href="categories.php?cat=sports" class="page-link">
-                        <strong>Sports & Fitness</strong>
-                        <div class="page-description">Soccer, basketball, gymnastics, martial arts</div>
-                    </a>
-                    <a href="categories.php?cat=arts" class="page-link">
-                        <strong>Arts & Crafts</strong>
-                        <div class="page-description">Drawing, painting, pottery, creative workshops</div>
-                    </a>
-                    <a href="categories.php?cat=music" class="page-link">
-                        <strong>Music & Performing Arts</strong>
-                        <div class="page-description">Piano, guitar, singing, dance, drama classes</div>
-                    </a>
-                    <a href="categories.php?cat=education" class="page-link">
-                        <strong>Educational Programs</strong>
-                        <div class="page-description">Tutoring, STEM, coding, language classes</div>
-                    </a>
-                    <a href="categories.php?cat=outdoor" class="page-link">
-                        <strong>Outdoor Activities</strong>
-                        <div class="page-description">Nature programs, camping, adventure activities</div>
-                    </a>
                 </div>
             </div>
 
             <div class="col-lg-6">
-                <!-- Support & Help -->
+                <!-- Legal -->
                 <div class="sitemap-section">
-                    <h3><i class="fas fa-life-ring text-primary me-2"></i>Support & Help</h3>
-                    <a href="help.php" class="page-link">
-                        <strong>Help Center</strong>
-                        <div class="page-description">Comprehensive help and user guides</div>
-                    </a>
-                    <a href="faq.php" class="page-link">
-                        <strong>FAQ</strong>
-                        <div class="page-description">Frequently asked questions and answers</div>
-                    </a>
-                    <a href="feedback.php" class="page-link">
-                        <strong>Feedback</strong>
-                        <div class="page-description">Share your suggestions and feedback</div>
-                    </a>
-                    <a href="report-issue.php" class="page-link">
-                        <strong>Report Issue</strong>
-                        <div class="page-description">Report technical problems or concerns</div>
-                    </a>
-                    <a href="accessibility.php" class="page-link">
-                        <strong>Accessibility</strong>
-                        <div class="page-description">Information about our accessibility features</div>
-                    </a>
-                </div>
-
-                <!-- Legal & Policies -->
-                <div class="sitemap-section">
-                    <h3><i class="fas fa-gavel text-primary me-2"></i>Legal & Policies</h3>
+                    <h3><i class="fas fa-gavel text-primary me-2"></i>Legal</h3>
                     <a href="privacy-policy.php" class="page-link">
                         <strong>Privacy Policy</strong>
                         <div class="page-description">How we collect, use, and protect your data</div>
@@ -257,34 +195,9 @@ require_once 'config/auth.php';
                         <strong>Terms & Conditions</strong>
                         <div class="page-description">Rules and guidelines for using our services</div>
                     </a>
-                    <a href="cookie-policy.php" class="page-link">
-                        <strong>Cookie Policy</strong>
-                        <div class="page-description">Information about cookies and tracking</div>
-                    </a>
-                    <a href="data-protection.php" class="page-link">
-                        <strong>Data Protection</strong>
-                        <div class="page-description">Our commitment to data security</div>
-                    </a>
-                </div>
-
-                <!-- Additional Features -->
-                <div class="sitemap-section">
-                    <h3><i class="fas fa-star text-primary me-2"></i>Features & Tools</h3>
-                    <a href="advanced-search.php" class="page-link">
-                        <strong>Advanced Search</strong>
-                        <div class="page-description">Detailed search with multiple filters</div>
-                    </a>
-                    <a href="activity-map.php" class="page-link">
-                        <strong>Activity Map</strong>
-                        <div class="page-description">Interactive map of activities by location</div>
-                    </a>
-                    <a href="age-appropriate.php" class="page-link">
-                        <strong>Age-Appropriate Activities</strong>
-                        <div class="page-description">Find activities suitable for specific age groups</div>
-                    </a>
-                    <a href="seasonal-activities.php" class="page-link">
-                        <strong>Seasonal Activities</strong>
-                        <div class="page-description">Activities organized by season and holidays</div>
+                    <a href="sitemap.php" class="page-link">
+                        <strong>Site Map</strong>
+                        <div class="page-description">Navigate all pages on KidsSmart</div>
                     </a>
                 </div>
             </div>
@@ -312,12 +225,12 @@ require_once 'config/auth.php';
             <div class="col-lg-4">
                 <div class="card">
                     <div class="card-header bg-success text-white">
-                        <h5 class="mb-0"><i class="fas fa-rss me-2"></i>Stay Updated</h5>
+                        <h5 class="mb-0"><i class="fas fa-search me-2"></i>Explore Activities</h5>
                     </div>
                     <div class="card-body">
-                        <p class="card-text">Get notified about new activities</p>
-                        <a href="newsletter.php" class="btn btn-success w-100">
-                            <i class="fas fa-envelope me-2"></i>Subscribe to Newsletter
+                        <p class="card-text">Ready to find activities for your kids?</p>
+                        <a href="search.php" class="btn btn-success w-100">
+                            <i class="fas fa-search me-2"></i>Start Searching
                         </a>
                     </div>
                 </div>
@@ -326,13 +239,19 @@ require_once 'config/auth.php';
             <div class="col-lg-4">
                 <div class="card">
                     <div class="card-header bg-info text-white">
-                        <h5 class="mb-0"><i class="fas fa-mobile-alt me-2"></i>Mobile App</h5>
+                        <h5 class="mb-0"><i class="fas fa-heart me-2"></i>Join KidsSmart</h5>
                     </div>
                     <div class="card-body">
-                        <p class="card-text">Take KidsSmart on the go</p>
-                        <a href="mobile-app.php" class="btn btn-info w-100">
-                            <i class="fas fa-download me-2"></i>Coming Soon
-                        </a>
+                        <p class="card-text">Create an account to save your favourites</p>
+                        <?php if (!is_logged_in()): ?>
+                            <a href="signup.php" class="btn btn-info w-100">
+                                <i class="fas fa-user-plus me-2"></i>Sign Up Free
+                            </a>
+                        <?php else: ?>
+                            <a href="dashboard.php" class="btn btn-info w-100">
+                                <i class="fas fa-tachometer-alt me-2"></i>View Dashboard
+                            </a>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>

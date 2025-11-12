@@ -1,4 +1,4 @@
-<footer class="bg-dark text-white py-4 mt-5">
+<footer class="bg-dark text-white mt-5" style="padding: 50px 0 20px 0;">
     <div class="container">
         <div class="row">
             <div class="col-md-4">
@@ -40,7 +40,6 @@
                 <ul class="list-unstyled">
                     <li><a href="privacy.php" class="text-white">Privacy Policy</a></li>
                     <li><a href="terms.php" class="text-white">Terms &amp; Conditions</a></li>
-                    <li><a href="cookies.php" class="text-white">Cookie Policy</a></li>
                     <li><a href="sitemap.php" class="text-white">Site Map</a></li>
                 </ul>
             </div>
