@@ -77,6 +77,8 @@ services:
       DB_NAME: ${DB_NAME_APP:-kidssmart_app}
       DB_USER: ${DB_USER:-app_user}
       DB_PASSWORD: ${DB_PASSWORD:-AppPass123!}
+      DOCKER_HOST: tcp://host.docker.internal:2375 
+      # Make sure you turn on "Expose daemon on tcp://localhost:2375 without TLS" in General Settings in Docker Desktop
     networks:
       - kidssmart_network
 
