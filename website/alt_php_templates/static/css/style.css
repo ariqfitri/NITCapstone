@@ -687,3 +687,25 @@
     top: 6px;
     color: white;
 }
+
+/* Footer spacing - more specific to override Bootstrap */
+footer.bg-dark { 
+    padding: 50px 0 20px 0 !important; 
+}
+
+footer.bg-dark h5 { 
+    margin-bottom: 20px !important; 
+}
+
+footer.bg-dark .list-unstyled li { 
+    margin-bottom: 6px !important; 
+}
+
+footer.bg-dark hr { 
+    margin: 30px 0 15px 0 !important; 
+}
+
+/* Footer spacing - override Bootstrap py-4 */
+footer.bg-dark.py-4 { 
+    padding: 50px 0 20px 0 !important; 
+}
