@@ -226,20 +226,6 @@ require_once 'config/auth.php';
                 </div>
             </div>
         </div>
-
-        <!-- XML Sitemap -->
-        <div class="text-center mt-5 p-4 bg-light rounded">
-            <h4><i class="fas fa-code text-primary me-2"></i>For Developers & SEO</h4>
-            <p class="text-muted mb-3">Looking for machine-readable site structure?</p>
-            <div class="btn-group" role="group">
-                <a href="/sitemap.xml" class="btn btn-outline-primary">
-                    <i class="fas fa-file-code me-2"></i>XML Sitemap
-                </a>
-                <a href="/robots.txt" class="btn btn-outline-secondary">
-                    <i class="fas fa-robot me-2"></i>Robots.txt
-                </a>
-            </div>
-        </div>
     </main>
 
     <?php include 'includes/footer.php'; ?>
