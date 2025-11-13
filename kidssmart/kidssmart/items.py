@@ -23,4 +23,15 @@ class KidssmartItem(scrapy.Item):
     website = scrapy.Field()
     age_range = scrapy.Field()
     cost = scrapy.Field()
-    schedule = scrapy.Field()
+    schedule = scrapy.Field()# --- ToyItem (added for Toys Spider) ---
+import scrapy
+
+class ToyItem(scrapy.Item):
+    name = scrapy.Field()
+    price = scrapy.Field()
+    category = scrapy.Field()
+    rating = scrapy.Field()
+    availability = scrapy.Field()
+    product_url = scrapy.Field()
+    sku = scrapy.Field()
+    timestamp = scrapy.Field()
