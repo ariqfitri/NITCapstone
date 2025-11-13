@@ -1,8 +1,5 @@
 <?php
-// Fixed auth.php - Check session status before starting
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+session_start();
 
 function is_logged_in() {
     return isset($_SESSION['user_id']) && !empty($_SESSION['user_id']);
@@ -48,4 +45,5 @@ function sanitize_input($data) {
 function is_admin() {
     return isset($_SESSION['user_id']) && isset($_SESSION['is_admin']) && $_SESSION['is_admin'] === true;
 }
+
 ?>

@@ -7,7 +7,7 @@ require_once __DIR__ . '/../config/auth.php';
             <i class="fas fa-child"></i> KidsSmart
         </a>
         
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
         
@@ -31,22 +31,16 @@ require_once __DIR__ . '/../config/auth.php';
                 <?php if (is_logged_in()): ?>
                     <?php $user_data = get_current_user_data(); ?>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" 
-                           href="#" 
-                           id="userDropdown" 
-                           role="button" 
-                           data-bs-toggle="dropdown" 
-                           aria-expanded="false"
-                           style="cursor: pointer;">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
                             <i class="fas fa-user"></i> 
                             <?= htmlspecialchars($user_data['first_name'] ?? $user_data['username']) ?>
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                            <li><a class="dropdown-item" href="dashboard.php"><i class="fas fa-tachometer-alt me-2"></i> Dashboard</a></li>
-                            <li><a class="dropdown-item" href="profile.php"><i class="fas fa-user-edit me-2"></i> Profile</a></li>
-                            <li><a class="dropdown-item" href="favourites.php"><i class="fas fa-heart me-2"></i> Favourites</a></li>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="dashboard.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                            <li><a class="dropdown-item" href="profile.php"><i class="fas fa-user-edit"></i> Profile</a></li>
+                            <li><a class="dropdown-item" href="favourites.php"><i class="fas fa-heart"></i> Favourites</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="logout.php"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+                            <li><a class="dropdown-item" href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
                         </ul>
                     </li>
                 <?php else: ?>
