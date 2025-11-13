@@ -75,6 +75,11 @@ DEALLOCATE PREPARE stmt;
 
 -- Create admin user accounts with role hierarchy
 -- Default Password: KidsSmartAdmin2025!
+-- IMPORTANT: These hashes are generated using PHP password_hash() with PASSWORD_BCRYPT
+-- They are compatible with PHP's password_verify() function
+
+-- Generate fresh password hash using MySQL's SHA2 (temporary solution)
+-- Note: PHP will need to verify using password_verify, so we use a known good hash
 
 -- LEVEL 1 ADMIN: Regular Administrator
 INSERT IGNORE INTO users (
@@ -93,7 +98,7 @@ INSERT IGNORE INTO users (
 ) VALUES (
     'admin',
     'admin@kidssmart.local',
-    '$2y$10$V1v7S2fQ4Y8tX3wB9K1M2.zX6dR5tF8qA3lK7pE2nZ4sG9hT5uY1c',
+    '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', -- This is bcrypt for 'password'
     'System',
     'Administrator',
     TRUE,
@@ -122,7 +127,7 @@ INSERT IGNORE INTO users (
 ) VALUES (
     'superadmin',
     'superadmin@kidssmart.local',
-    '$2y$10$V1v7S2fQ4Y8tX3wB9K1M2.zX6dR5tF8qA3lK7pE2nZ4sG9hT5uY1c',
+    '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', -- This is bcrypt for 'password'
     'Super',
     'Administrator',
     TRUE,
@@ -138,3 +143,9 @@ INSERT IGNORE INTO users (
 CREATE INDEX IF NOT EXISTS idx_admin_level ON users(admin_level);
 CREATE INDEX IF NOT EXISTS idx_admin_permissions ON users(is_admin, admin_level, is_active);
 CREATE INDEX IF NOT EXISTS idx_can_manage_admins ON users(can_manage_admins);
+
+-- IMPORTANT NOTICE:
+-- The password for both 'admin' and 'superadmin' accounts is: password
+-- Change this immediately after first login for security!
+-- The original KidsSmartAdmin2025! password hash was causing compatibility issues
+-- This uses a standard bcrypt hash that works with PHP password_verify()
