@@ -11,7 +11,12 @@ class SerpapiSpider(scrapy.Spider):
     allowed_domains = ["serpapi.com"]
     custom_settings = {
         "ROBOTSTXT_OBEY": False,
+        "CONCURRENT_REQUESTS": 16,
+        "CONCURRENT_REQUESTS_PER_DOMAIN": 16,
         "AUTOTHROTTLE_ENABLED": True,
+        "AUTOTHROTTLE_START_DELAY": 0.5,
+        "AUTOTHROTTLE_MAX_DELAY": 3,
+        "AUTOTHROTTLE_TARGET_CONCURRENCY": 4,
         "DOWNLOAD_DELAY": 1.5,
         "DOWNLOAD_HANDLERS": {
             "http": "scrapy.core.downloader.handlers.http.HTTPDownloadHandler",
@@ -38,14 +43,13 @@ class SerpapiSpider(scrapy.Spider):
             self.logger.error("SERPAPI_API_KEY not found in environment variables.")
             return
 
-        # Create specific search queries from using the categories listed
         base_location = "Melbourne"
         for category, keywords in self.CATEGORIES.items():
             for keyword in keywords:
                 query = f"{keyword} classes for kids in {base_location}"
                 url = (
                     f"https://serpapi.com/search.json?"
-                    f"engine=google_maps&q={query}&type=search&api_key={api_key}"
+                    f"engine=google_maps&q={query}&type=search&photos=true&api_key={api_key}"
                 )
                 yield scrapy.Request(
                     url, callback=self.parse, meta={"category": category, "query": query}
@@ -67,28 +71,46 @@ class SerpapiSpider(scrapy.Spider):
 
         for place in places:
             item = KidssmartItem()
-
             item["title"] = place.get("title")
             item["address"] = place.get("address")
             item["suburb"] = self.extract_suburb(place.get("address"))
             item["postcode"] = self.extract_postcode(place.get("address"))
             item["category"] = category
 
+            if "Australia" not in (place.get("address") or ""):
+                self.logger.info(f"Skipping non-Australian result: {item['title']} - {item['address']}")
+                continue
+
             item["description"] = (
-                    place.get("description")
-                    or place.get("snippet")
-                    or "Kids-related activity or venue")
+                place.get("description")
+                or place.get("snippet")
+                or "Kids-related activity or venue"
+            )
             item["phone"] = place.get("phone")
             item["website"] = place.get("website")
             item["email"] = None
             item["age_range"] = None
             item["cost"] = None
             item["schedule"] = None
-            item["image_url"] = place.get("images")
             item["source_url"] = place.get("links", {}).get("website")
 
-            if item["source_url"] and not item["source_url"].startswith("http"):
-                item["source_url"] = None
+            # --- IMAGE HANDLING SECTION ---
+            photo_url = None
+
+            # First: try scraping the place's website for the largest image
+            if item.get("website"):
+                yield scrapy.Request(
+                    item["website"],
+                    callback=self.parse_website_image,
+                    meta={"item": item},
+                    dont_filter=True,
+                )
+            else:
+                # If no website, fallback to SerpAPI images
+                photo_url = self.get_serpapi_image(place)
+                item["image_url"] = photo_url
+                yield item
+            # --- END IMAGE HANDLING ---
 
             if item["website"]:
                 yield scrapy.Request(
@@ -101,7 +123,6 @@ class SerpapiSpider(scrapy.Spider):
                 yield item
 
     def parse_website(self, response):
-        """Extract additional info like description, email, schedule, cost, and age range."""
         item = response.meta["item"]
 
         meta_desc = response.xpath("//meta[@name='description']/@content").get()
@@ -137,10 +158,18 @@ class SerpapiSpider(scrapy.Spider):
             else:
                 item["age_range"] = f"{age_match.group(1)}+"
 
+        #️Try to extract better image from website if missing or low quality
+        if not item.get("image_url"):
+            images = response.xpath("//img/@src").getall()
+            valid_images = [i for i in images if i.startswith("http") and not i.endswith(".svg")]
+            for img in valid_images:
+                if not any(x in img.lower() for x in ["logo", "icon", "placeholder"]):
+                    item["image_url"] = img
+                    break
+
         yield item
 
     def extract_suburb(self, address):
-        """Extract suburb name from address (Australian-style)."""
         if not address:
             return None
         parts = address.split(",")
@@ -149,8 +178,43 @@ class SerpapiSpider(scrapy.Spider):
         return None
 
     def extract_postcode(self, address):
-        """Extract 4-digit postcode from address."""
         if not address:
             return None
         match = re.search(r"\b\d{4}\b", address)
         return match.group(0) if match else None
+
+    def parse_website_image(self, response):
+        item = response.meta["item"]
+
+        images = response.css("img::attr(src)").getall()
+        if images:
+            # Convert relative URLs to absolute
+            from urllib.parse import urljoin
+            images = [urljoin(response.url, img) for img in images]
+
+            # Try to pick large images based on filename hints
+            large_images = [
+                img for img in images if any(x in img.lower() for x in ["large", "full", "max", "original"])
+            ]
+            if large_images:
+                item["image_url"] = large_images[0]
+            else:
+                # fallback: just take the first image
+                item["image_url"] = images[0]
+        else:
+            # fallback to SerpAPI if no images found
+            place = item.get("place_data")  # pass the place JSON in the item earlier
+            item["image_url"] = self.get_serpapi_image(place)
+
+        yield item
+
+    def get_serpapi_image(self, place):
+        # Fallback to SerpAPI images
+        if "photos" in place and place["photos"]:
+            photo_ref = place["photos"][0].get("photo_reference")
+            if photo_ref:
+                return f"https://maps.googleapis.com/maps/api/place/photo?maxwidth=1600&photoreference={photo_ref}&key=YOUR_GOOGLE_API_KEY"
+
+        # fallback to thumbnail if no photos
+        return place.get("thumbnail")
+
