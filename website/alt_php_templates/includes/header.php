@@ -7,7 +7,7 @@ require_once __DIR__ . '/../config/auth.php';
             <i class="fas fa-child"></i> KidsSmart
         </a>
         
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
         
@@ -29,17 +29,11 @@ require_once __DIR__ . '/../config/auth.php';
             
             <ul class="navbar-nav">
                 <?php if (is_logged_in()): ?>
-                    <?php $user_data = get_current_user_data(); ?>
+                    <?php $user_data = get_current_user_data() ?? []; ?>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" 
-                           href="#" 
-                           id="userDropdown" 
-                           role="button" 
-                           data-bs-toggle="dropdown" 
-                           aria-expanded="false"
-                           style="cursor: pointer;">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
                             <i class="fas fa-user"></i> 
-                            <?= htmlspecialchars($user_data['first_name'] ?? $user_data['username']) ?>
+                            <?= htmlspecialchars((!empty($user_data['first_name']) ? $user_data['first_name'] : (!empty($user_data['username']) ? $user_data['username'] : 'User'))) ?>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                             <li><a class="dropdown-item" href="dashboard.php"><i class="fas fa-tachometer-alt me-2"></i> Dashboard</a></li>

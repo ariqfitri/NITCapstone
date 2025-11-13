@@ -13,7 +13,19 @@ function get_current_user_id() {
 }
 
 function get_current_user_data() {
-    return $_SESSION['user_data'] ?? null;
+    // Build user_data array from session variables
+    if (!is_logged_in()) {
+        return null;
+    }
+    
+    return [
+        'user_id' => $_SESSION['user_id'] ?? null,
+        'username' => $_SESSION['username'] ?? null,
+        'email' => $_SESSION['user_email'] ?? null,
+        'first_name' => $_SESSION['first_name'] ?? null,
+        'last_name' => $_SESSION['last_name'] ?? null,
+        'full_name' => $_SESSION['user_name'] ?? null
+    ];
 }
 
 function redirect_if_logged_in($redirect_to = 'dashboard.php') {
