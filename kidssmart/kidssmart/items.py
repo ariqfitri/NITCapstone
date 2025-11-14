@@ -13,6 +13,7 @@ class KidssmartItem(scrapy.Item):
     suburb = scrapy.Field()
     postcode = scrapy.Field()
     activity_type = scrapy.Field()
+    category = scrapy.Field()
     
     # NEW fields for unified schema
     source_url = scrapy.Field()
@@ -21,6 +22,7 @@ class KidssmartItem(scrapy.Item):
     phone = scrapy.Field()
     email = scrapy.Field()
     website = scrapy.Field()
+    image_url = scrapy.Field()
     age_range = scrapy.Field()
     cost = scrapy.Field()
     schedule = scrapy.Field()# --- ToyItem (added for Toys Spider) ---

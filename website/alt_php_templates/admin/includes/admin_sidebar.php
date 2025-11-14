@@ -38,13 +38,13 @@
         </h6>
         <ul class="nav flex-column mb-2">
             <li class="nav-item">
-                <a class="nav-link" href="reports.php">
+                <a class="nav-link <?= basename($_SERVER['PHP_SELF']) == 'reports.php' ? 'active' : '' ?>" href="reports.php">
                     <i class="fas fa-chart-bar me-2"></i>
                     Analytics
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="logs.php">
+                <a class="nav-link <?= basename($_SERVER['PHP_SELF']) == 'logs.php' ? 'active' : '' ?>" href="logs.php">
                     <i class="fas fa-clipboard-list me-2"></i>
                     System Logs
                 </a>
@@ -56,7 +56,7 @@
         </h6>
         <ul class="nav flex-column mb-2">
             <li class="nav-item">
-                <a class="nav-link" href="settings.php">
+                <a class="nav-link <?= basename($_SERVER['PHP_SELF']) == 'settings.php' ? 'active' : '' ?>" href="settings.php">
                     <i class="fas fa-cog me-2"></i>
                     System Settings
                 </a>

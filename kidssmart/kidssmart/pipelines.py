@@ -50,10 +50,34 @@ class MySQLActivityPipeline:
         if 'title' not in item:
             return
         try:
+<<<<<<< HEAD
             self.cursor.execute(
                 "INSERT INTO activities (title, scraped_at) VALUES (%s, %s)",
                 (item.get('title'), datetime.now())
             )
+=======
+            self.cursor.execute("""
+                INSERT INTO activities (
+                    title, description, category, suburb, postcode, address,
+                    phone, email, website, image_url, source_url, source_name, scraped_at
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """, (
+                item.get('title'),
+                item.get('description'),
+                item.get('category'),
+                item.get('suburb'),
+                item.get('postcode'),
+                item.get('address'),
+                item.get('phone'),
+                item.get('email'),
+                item.get('website'),
+                item.get('image_url'),
+                item.get('source_url'),
+                spider.name,
+                datetime.now()
+            ))
+            
+>>>>>>> 944f16da9150a1cf130b6cc1846a9742dc0cd920
             self.connection.commit()
             spider.logger.info(f"Saved activity: {item.get('title')}")
         except Exception as e:
