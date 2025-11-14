@@ -217,4 +217,3 @@ class SerpapiSpider(scrapy.Spider):
 
         # fallback to thumbnail if no photos
         return place.get("thumbnail")
-

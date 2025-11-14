@@ -399,7 +399,7 @@ unset($_SESSION['success_message'], $_SESSION['error_message']);
                                             </td>
                                             <td>
                                                 <small class="text-muted">
-                                                    <?= htmlspecialchars($activity['source'] ?: 'N/A') ?>
+                                                    <?= htmlspecialchars($activity['source_name'] ?: 'N/A') ?>
                                                 </small>
                                             </td>
                                             <td>

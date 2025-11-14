@@ -17,6 +17,32 @@ $appDb = $appDatabase->getConnection();
 $scraper = new Scraper($appDb);
 $program = new Program($appDb);
 
+// Handle stop scraper request
+if (isset($_POST['stop_scraper'])) {
+    $scraper_name = $_POST['stop_scraper'];
+    
+    // Kill all running scraper containers
+    $find_command = "docker ps --filter ancestor=nitcapstone-scraper --format '{{.ID}}'";
+    exec($find_command, $container_ids, $find_return);
+    
+    if (!empty($container_ids)) {
+        foreach ($container_ids as $container_id) {
+            $container_id = trim($container_id);
+            if (!empty($container_id)) {
+                $kill_command = "docker kill " . escapeshellarg($container_id) . " 2>&1";
+                exec($kill_command, $kill_output, $kill_return);
+            }
+        }
+        $scraper->logScraperRun($scraper_name, 'stopped', 'Manually stopped by admin');
+        $_SESSION['flash_message'] = "Scraper {$scraper_name} has been stopped.";
+    } else {
+        $_SESSION['flash_message'] = "No running {$scraper_name} containers found.";
+    }
+    
+    header('Location: admin_scrapers.php');
+    exit;
+}
+
 // Handle scraper execution
 if (isset($_POST['run_scraper'])) {
     $scraper_name = $_POST['run_scraper'];
@@ -85,9 +111,9 @@ if (isset($_POST['run_scraper'])) {
     
     // Set flash message
     if ($status === 'completed') {
-        $_SESSION['flash_message'] = "✅ Scraper $scraper_name completed successfully in {$execution_time}s!";
+        $_SESSION['flash_message'] = "Scraper $scraper_name completed successfully in {$execution_time}s!";
     } else {
-        $_SESSION['flash_message'] = "❌ Scraper $scraper_name failed after {$execution_time}s. Check logs for details.";
+        $_SESSION['flash_message'] = "Scraper $scraper_name failed after {$execution_time}s. Check logs for details.";
     }
     
     header('Location: admin_scrapers.php');
@@ -186,29 +212,35 @@ try {
                             </div>
                             <div class="card-body">
                                 <form method="POST" class="d-grid gap-3">
-                                    <button type="submit" name="run_scraper" value="activities" 
-                                            class="btn btn-primary btn-lg scraper-btn"
-                                            onclick="startScraper(this, 'Activities')">
-                                        <i class="fas fa-spider me-2"></i>
-                                        Run Activities Spider
-                                        <small class="d-block">Scrapes activeactivities.com.au</small>
-                                    </button>
+                                    <div class="d-flex gap-2 align-items-center">
+                                        <button type="submit" name="run_scraper" value="kidsbook" 
+                                                class="btn btn-info btn-lg scraper-btn flex-grow-1"
+                                                onclick="startScraper(this, 'KidsBook')">
+                                            <i class="fas fa-spider me-2"></i>
+                                            Run KidsBook Spider
+                                            <small class="d-block">Scrapes kidsbook.com.au</small>
+                                        </button>
+                                        <button type="submit" name="stop_scraper" value="kidsbook" 
+                                                class="btn btn-danger btn-lg"
+                                                onclick="event.stopPropagation(); return confirm('Stop KidsBook spider?')">
+                                            <i class="fas fa-stop"></i>
+                                        </button>
+                                    </div>
                                     
-                                    <button type="submit" name="run_scraper" value="kidsbook" 
-                                            class="btn btn-info btn-lg scraper-btn"
-                                            onclick="startScraper(this, 'KidsBook')">
-                                        <i class="fas fa-spider me-2"></i>
-                                        Run KidsBook Spider
-                                        <small class="d-block">Scrapes kidsbook.com.au</small>
-                                    </button>
-                                    
-                                    <button type="submit" name="run_scraper" value="serpapi" 
-                                            class="btn btn-warning btn-lg scraper-btn"
-                                            onclick="startScraper(this, 'SerpAPI')">
-                                        <i class="fas fa-spider me-2"></i>
-                                        Run SerpAPI Spider
-                                        <small class="d-block">Scrapes Google Maps via SerpAPI</small>
-                                    </button>
+                                    <div class="d-flex gap-2 align-items-center">
+                                        <button type="submit" name="run_scraper" value="serpapi" 
+                                                class="btn btn-warning btn-lg scraper-btn flex-grow-1"
+                                                onclick="startScraper(this, 'SerpAPI')">
+                                            <i class="fas fa-spider me-2"></i>
+                                            Run SerpAPI Spider
+                                            <small class="d-block">Scrapes Google Maps via SerpAPI</small>
+                                        </button>
+                                        <button type="submit" name="stop_scraper" value="serpapi" 
+                                                class="btn btn-danger btn-lg"
+                                                onclick="event.stopPropagation(); return confirm('Stop SerpAPI spider?')">
+                                            <i class="fas fa-stop"></i>
+                                        </button>
+                                    </div>
                                 </form>
                                 
                                 <div class="mt-3 p-3 bg-light rounded">
@@ -218,8 +250,9 @@ try {
                                     </h6>
                                     <ul class="mb-0 small">
                                         <li>Click button to start scraper immediately</li>
+                                        <li>Click red stop button to terminate running spider</li>
                                         <li>Page will reload when scraping is complete</li>
-                                        <li>Check "Recent Runs" for execution details</li>
+                                        <li>Check Recent Runs for execution details</li>
                                         <li>New activities appear in statistics automatically</li>
                                     </ul>
                                 </div>
@@ -303,7 +336,8 @@ try {
                                                     $status_config = [
                                                         'started' => ['class' => 'warning', 'icon' => 'clock', 'text' => 'Running'],
                                                         'completed' => ['class' => 'success', 'icon' => 'check-circle', 'text' => 'Success'], 
-                                                        'failed' => ['class' => 'danger', 'icon' => 'times-circle', 'text' => 'Failed']
+                                                        'failed' => ['class' => 'danger', 'icon' => 'times-circle', 'text' => 'Failed'],
+                                                        'stopped' => ['class' => 'secondary', 'icon' => 'stop-circle', 'text' => 'Stopped']
                                                     ];
                                                     $config = $status_config[$run['status']] ?? ['class' => 'secondary', 'icon' => 'question', 'text' => 'Unknown'];
                                                     ?>
@@ -346,18 +380,13 @@ try {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
     function startScraper(button, name) {
-        // Add running animation
         button.classList.add('running');
         button.innerHTML = `
             <i class="fas fa-spinner fa-spin me-2"></i>
             Running ${name} Spider...
             <small class="d-block">This may take several minutes</small>
         `;
-        
-        // Show page loading overlay
         document.body.style.cursor = 'wait';
-        
-        // ACTUALLY SUBMIT THE FORM!
         button.form.submit();
     }
 
@@ -365,13 +394,12 @@ try {
         location.reload();
     }
     
-    // Auto-refresh if there are running scrapers
     document.addEventListener('DOMContentLoaded', function() {
         const runningStatus = document.querySelector('.badge.bg-warning');
         if (runningStatus) {
             setTimeout(() => {
                 location.reload();
-            }, 10000); // Check every 10 seconds
+            }, 10000);
         }
     });
     </script>
