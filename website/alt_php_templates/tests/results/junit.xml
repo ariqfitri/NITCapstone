@@ -1,24 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="KidsSmart\Tests\Integration\MIntegrationTest" file="/home/nobody3/Documents/NIT3004/NITCapstone/website/alt_php_templates/tests/Integration/IntegrationTest.php" tests="3" assertions="9" errors="2" failures="0" skipped="0" time="2.128661">
-    <testcase name="testDatabaseConnections" file="/home/nobody3/Documents/NIT3004/NITCapstone/website/alt_php_templates/tests/Integration/IntegrationTest.php" line="33" class="KidsSmart\Tests\Integration\MIntegrationTest" classname="KidsSmart.Tests.Integration.MIntegrationTest" assertions="4" time="0.669655"/>
-    <testcase name="testUserFavouriteActivity" file="/home/nobody3/Documents/NIT3004/NITCapstone/website/alt_php_templates/tests/Integration/IntegrationTest.php" line="50" class="KidsSmart\Tests\Integration\MIntegrationTest" classname="KidsSmart.Tests.Integration.MIntegrationTest" assertions="5" time="0.838772">
-      <error type="Error">KidsSmart\Tests\Integration\MIntegrationTest::testUserFavouriteActivity
-Error: Call to a member function prepare() on null
-
-/home/nobody3/Documents/NIT3004/NITCapstone/website/alt_php_templates/models/Favourite.php:114
-/home/nobody3/Documents/NIT3004/NITCapstone/website/alt_php_templates/models/Favourite.php:20
-/home/nobody3/Documents/NIT3004/NITCapstone/website/alt_php_templates/tests/Integration/IntegrationTest.php:86</error>
-      <system-out>Database connection failed. Please try again later.</system-out>
-    </testcase>
-    <testcase name="testDataConsistency" file="/home/nobody3/Documents/NIT3004/NITCapstone/website/alt_php_templates/tests/Integration/IntegrationTest.php" line="99" class="KidsSmart\Tests\Integration\MIntegrationTest" classname="KidsSmart.Tests.Integration.MIntegrationTest" assertions="0" time="0.620234">
-      <error type="Error">KidsSmart\Tests\Integration\MIntegrationTest::testDataConsistency
-Error: Call to a member function prepare() on null
-
-/home/nobody3/Documents/NIT3004/NITCapstone/website/alt_php_templates/models/Favourite.php:114
-/home/nobody3/Documents/NIT3004/NITCapstone/website/alt_php_templates/models/Favourite.php:20
-/home/nobody3/Documents/NIT3004/NITCapstone/website/alt_php_templates/tests/Integration/IntegrationTest.php:113</error>
-      <system-out>Database connection failed. Please try again later.</system-out>
-    </testcase>
+  <testsuite name="CLI Arguments" tests="7" assertions="28" errors="0" failures="0" skipped="0" time="4.633562">
+    <testsuite name="KidsSmart\Tests\Unit\ProgramTest" file="/home/nobody3/Documents/NIT3004/NITCapstone/website/alt_php_templates/tests/Unit/ProgramTest.php" tests="3" assertions="11" errors="0" failures="0" skipped="0" time="2.002203">
+      <testcase name="testGetFeaturedPrograms" file="/home/nobody3/Documents/NIT3004/NITCapstone/website/alt_php_templates/tests/Unit/ProgramTest.php" line="34" class="KidsSmart\Tests\Unit\ProgramTest" classname="KidsSmart.Tests.Unit.ProgramTest" assertions="3" time="0.845452"/>
+      <testcase name="testSearchPrograms" file="/home/nobody3/Documents/NIT3004/NITCapstone/website/alt_php_templates/tests/Unit/ProgramTest.php" line="52" class="KidsSmart\Tests\Unit\ProgramTest" classname="KidsSmart.Tests.Unit.ProgramTest" assertions="4" time="0.584261"/>
+      <testcase name="testGetProgramById" file="/home/nobody3/Documents/NIT3004/NITCapstone/website/alt_php_templates/tests/Unit/ProgramTest.php" line="87" class="KidsSmart\Tests\Unit\ProgramTest" classname="KidsSmart.Tests.Unit.ProgramTest" assertions="4" time="0.572491"/>
+    </testsuite>
+    <testsuite name="KidsSmart\Tests\Unit\UserTest" file="/home/nobody3/Documents/NIT3004/NITCapstone/website/alt_php_templates/tests/Unit/UserTest.php" tests="4" assertions="17" errors="0" failures="0" skipped="0" time="2.631359">
+      <testcase name="testUserRegistration" file="/home/nobody3/Documents/NIT3004/NITCapstone/website/alt_php_templates/tests/Unit/UserTest.php" line="38" class="KidsSmart\Tests\Unit\UserTest" classname="KidsSmart.Tests.Unit.UserTest" assertions="4" time="0.621970"/>
+      <testcase name="testUserLogin" file="/home/nobody3/Documents/NIT3004/NITCapstone/website/alt_php_templates/tests/Unit/UserTest.php" line="65" class="KidsSmart\Tests\Unit\UserTest" classname="KidsSmart.Tests.Unit.UserTest" assertions="3" time="0.688196"/>
+      <testcase name="testSessionManagement" file="/home/nobody3/Documents/NIT3004/NITCapstone/website/alt_php_templates/tests/Unit/UserTest.php" line="97" class="KidsSmart\Tests\Unit\UserTest" classname="KidsSmart.Tests.Unit.UserTest" assertions="6" time="0.627920"/>
+      <testcase name="testPasswordSecurity" file="/home/nobody3/Documents/NIT3004/NITCapstone/website/alt_php_templates/tests/Unit/UserTest.php" line="120" class="KidsSmart\Tests\Unit\UserTest" classname="KidsSmart.Tests.Unit.UserTest" assertions="4" time="0.693273"/>
+    </testsuite>
   </testsuite>
 </testsuites>

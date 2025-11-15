@@ -1,5 +1,21 @@
 <?php
 require_once __DIR__ . '/../config/auth.php';
+
+// Get user data from session for display
+$user_display_data = [];
+if (is_logged_in()) {
+    // Check if user_data exists in session (from newer code)
+    if (isset($_SESSION['user_data'])) {
+        $user_display_data = $_SESSION['user_data'];
+    } else {
+        // Fallback to individual session variables (from login.php)
+        $user_display_data = [
+            'username' => $_SESSION['username'] ?? '',
+            'first_name' => $_SESSION['user_name'] ? explode(' ', $_SESSION['user_name'])[0] : ($_SESSION['username'] ?? ''),
+            'email' => $_SESSION['user_email'] ?? ''
+        ];
+    }
+}
 ?>
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
     <div class="container">
@@ -7,7 +23,7 @@ require_once __DIR__ . '/../config/auth.php';
             <i class="fas fa-child"></i> KidsSmart
         </a>
         
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         
@@ -29,11 +45,16 @@ require_once __DIR__ . '/../config/auth.php';
             
             <ul class="navbar-nav">
                 <?php if (is_logged_in()): ?>
-                    <?php $user_data = get_current_user_data() ?? []; ?>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                        <a class="nav-link dropdown-toggle" 
+                           href="#" 
+                           id="userDropdown" 
+                           role="button" 
+                           data-bs-toggle="dropdown" 
+                           aria-expanded="false"
+                           style="cursor: pointer;">
                             <i class="fas fa-user"></i> 
-                            <?= htmlspecialchars((!empty($user_data['first_name']) ? $user_data['first_name'] : (!empty($user_data['username']) ? $user_data['username'] : 'User'))) ?>
+                            <?= htmlspecialchars($user_display_data['first_name'] ?? $user_display_data['username'] ?? 'User') ?>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                             <li><a class="dropdown-item" href="dashboard.php"><i class="fas fa-tachometer-alt me-2"></i> Dashboard</a></li>
