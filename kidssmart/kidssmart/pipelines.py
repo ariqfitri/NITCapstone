@@ -47,15 +47,14 @@ class MySQLActivityPipeline:
     def _save_to_db(self, item, spider):
         """Save item to DB (simplified for demo)"""
         # Example: Only insert title if present
-        if 'title' not in item:
+        if not item.get('title'):
             return
         try:
-<<<<<<< HEAD
-            self.cursor.execute(
-                "INSERT INTO activities (title, scraped_at) VALUES (%s, %s)",
-                (item.get('title'), datetime.now())
-            )
-=======
+
+            #self.cursor.execute(
+                #"INSERT INTO activities (title, scraped_at) VALUES (%s, %s)",
+                #(item.get('title'), datetime.now())
+            #)
             self.cursor.execute("""
                 INSERT INTO activities (
                     title, description, category, suburb, postcode, address,
@@ -76,8 +75,7 @@ class MySQLActivityPipeline:
                 spider.name,
                 datetime.now()
             ))
-            
->>>>>>> 944f16da9150a1cf130b6cc1846a9742dc0cd920
+
             self.connection.commit()
             spider.logger.info(f"Saved activity: {item.get('title')}")
         except Exception as e:
