@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="KidsSmart\Tests\Integration\MIntegrationTest" file="/home/nobody3/Documents/NIT3004/NITCapstone/website/alt_php_templates/tests/Integration/IntegrationTest.php" tests="3" assertions="9" errors="2" failures="0" skipped="0" time="2.128661">
+    <testcase name="testDatabaseConnections" file="/home/nobody3/Documents/NIT3004/NITCapstone/website/alt_php_templates/tests/Integration/IntegrationTest.php" line="33" class="KidsSmart\Tests\Integration\MIntegrationTest" classname="KidsSmart.Tests.Integration.MIntegrationTest" assertions="4" time="0.669655"/>
+    <testcase name="testUserFavouriteActivity" file="/home/nobody3/Documents/NIT3004/NITCapstone/website/alt_php_templates/tests/Integration/IntegrationTest.php" line="50" class="KidsSmart\Tests\Integration\MIntegrationTest" classname="KidsSmart.Tests.Integration.MIntegrationTest" assertions="5" time="0.838772">
+      <error type="Error">KidsSmart\Tests\Integration\MIntegrationTest::testUserFavouriteActivity
+Error: Call to a member function prepare() on null
+
+/home/nobody3/Documents/NIT3004/NITCapstone/website/alt_php_templates/models/Favourite.php:114
+/home/nobody3/Documents/NIT3004/NITCapstone/website/alt_php_templates/models/Favourite.php:20
+/home/nobody3/Documents/NIT3004/NITCapstone/website/alt_php_templates/tests/Integration/IntegrationTest.php:86</error>
+      <system-out>Database connection failed. Please try again later.</system-out>
+    </testcase>
+    <testcase name="testDataConsistency" file="/home/nobody3/Documents/NIT3004/NITCapstone/website/alt_php_templates/tests/Integration/IntegrationTest.php" line="99" class="KidsSmart\Tests\Integration\MIntegrationTest" classname="KidsSmart.Tests.Integration.MIntegrationTest" assertions="0" time="0.620234">
+      <error type="Error">KidsSmart\Tests\Integration\MIntegrationTest::testDataConsistency
+Error: Call to a member function prepare() on null
+
+/home/nobody3/Documents/NIT3004/NITCapstone/website/alt_php_templates/models/Favourite.php:114
+/home/nobody3/Documents/NIT3004/NITCapstone/website/alt_php_templates/models/Favourite.php:20
+/home/nobody3/Documents/NIT3004/NITCapstone/website/alt_php_templates/tests/Integration/IntegrationTest.php:113</error>
+      <system-out>Database connection failed. Please try again later.</system-out>
+    </testcase>
+  </testsuite>
+</testsuites>

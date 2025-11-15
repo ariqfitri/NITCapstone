@@ -222,7 +222,7 @@ if (empty($real_categories)) {
                                    id="search-query" 
                                    name="q" 
                                    class="form-control main-search-input" 
-                                   placeholder="e.g. swimming, soccer, art classes"
+                                   placeholder="e.g. soccer, arts, learning"
                                    value="<?= htmlspecialchars($_GET['q'] ?? '') ?>"
                                    required 
                                    minlength="2"
@@ -270,7 +270,7 @@ if (empty($real_categories)) {
                     <div class="stat-card">
                         <i class="fas fa-list category-icon text-warning"></i>
                         <div class="stat-number"><?= number_format($stats['total_categories']) ?></div>
-                        <h5>Activity Categories</h5>
+                        <h5>Categories</h5>
                     </div>
                 </div>
                 <div class="col-md-4">

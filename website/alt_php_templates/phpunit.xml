@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.0/phpunit.xsd"
+         bootstrap="tests/bootstrap.php"
+         colors="true"
+         failOnRisky="true"
+         failOnWarning="true"
+         stopOnFailure="false">
+    
+    <!-- Test Suites Configuration -->
+    <testsuites>
+        <testsuite name="Unit">
+            <directory>tests/Unit</directory>
+        </testsuite>
+        <testsuite name="Integration">
+            <directory>tests/Integration</directory>
+        </testsuite>
+        <testsuite name="Functional">
+            <directory>tests/Functional</directory>
+        </testsuite>
+        <testsuite name="All">
+            <directory>tests</directory>
+        </testsuite>
+    </testsuites>
+
+    <!-- Source Code Coverage Configuration -->
+    <source>
+        <include>
+            <directory suffix=".php">models</directory>
+            <directory suffix=".php">config</directory>
+            <directory suffix=".php">includes</directory>
+        </include>
+        <exclude>
+            <directory>vendor</directory>
+            <directory>tests</directory>
+            <file>config/database.php</file>
+        </exclude>
+    </source>
+
+    <!-- Test Environment Variables -->
+    <php>
+        <env name="DB_HOST" value="localhost"/>
+        <env name="DB_NAME" value="kidssmart_test"/>
+        <env name="DB_USER" value="kidssmart_user"/>
+        <env name="DB_PASS" value="SecurePass123!"/>
+        <env name="DB_NAME_USERS" value="kidssmart_users_test"/>
+        <env name="TEST_MODE" value="true"/>
+    </php>
+
+    <!-- Logging Configuration -->
+    <logging>
+        <junit outputFile="tests/results/junit.xml"/>
+        <testdoxHtml outputFile="tests/results/testdox.html"/>
+    </logging>
+
+</phpunit>

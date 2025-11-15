@@ -1,0 +1,38 @@
+{
+    "name": "ariqfitri/kidssmart",
+    "description": "KidsSmart PHP Testing Framework",
+    "type": "project",
+    "require": {
+        "php": "^8.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.0",
+        "phpunit/php-code-coverage": "^10.0",
+        "fakerphp/faker": "^1.20",
+        "phpstan/phpstan": "^1.10"
+    },
+    "autoload": {
+        "psr-4": {
+            "KidsSmart\\": "src/",
+            "KidsSmart\\Models\\": "models/",
+            "KidsSmart\\Config\\": "config/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "KidsSmart\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "test-coverage": "phpunit --coverage-html coverage/",
+        "test-unit": "phpunit tests/Unit/",
+        "test-integration": "phpunit tests/Integration/",
+        "test-functional": "phpunit tests/Functional/",
+        "analyze": "phpstan analyse src tests --level=7"
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
+    }
+}
