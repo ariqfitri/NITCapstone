@@ -45,42 +45,42 @@ class MySQLActivityPipeline:
         return item
 
     def _save_to_db(self, item, spider):
-        """Save item to DB (simplified for demo)"""
-        # Example: Only insert title if present
         if not item.get('title'):
             return
-        try:
 
-            #self.cursor.execute(
-                #"INSERT INTO activities (title, scraped_at) VALUES (%s, %s)",
-                #(item.get('title'), datetime.now())
-            #)
-            self.cursor.execute("""
-                INSERT INTO activities (
-                    title, description, category, suburb, postcode, address,
-                    phone, email, website, image_url, source_url, source_name, scraped_at
-                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-            """, (
-                item.get('title'),
-                item.get('description'),
-                item.get('category'),
-                item.get('suburb'),
-                item.get('postcode'),
-                item.get('address'),
-                item.get('phone'),
-                item.get('email'),
-                item.get('website'),
-                item.get('image_url'),
-                item.get('source_url'),
-                spider.name,
-                datetime.now()
-            ))
+        # Check if the record already exists based on title
+        self.cursor.execute(
+            "SELECT activity_id FROM activities WHERE title = %s",
+            (item.get('title'),)
+        )
+        result = self.cursor.fetchone()
+        if result:
+            spider.logger.info(f"Duplicate found, skipping: {item.get('title')}")
+            return
 
-            self.connection.commit()
-            spider.logger.info(f"Saved activity: {item.get('title')}")
-        except Exception as e:
-            self.connection.rollback()
-            spider.logger.error(f"Error saving activity '{item.get('title')}': {e}")
+        # Insert if not found
+        self.cursor.execute("""
+            INSERT INTO activities (
+                title, description, category, suburb, postcode, address,
+                phone, email, website, image_url, source_url, source_name, scraped_at
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """, (
+            item.get('title'),
+            item.get('description'),
+            item.get('category'),
+            item.get('suburb'),
+            item.get('postcode'),
+            item.get('address'),
+            item.get('phone'),
+            item.get('email'),
+            item.get('website'),
+            item.get('image_url'),
+            item.get('source_url'),
+            spider.name,
+            datetime.now()
+        ))
+        self.connection.commit()
+        spider.logger.info(f"Saved activity: {item.get('title')}")
 
 
 # --- ToysPipeline (for Toys Spider) ---

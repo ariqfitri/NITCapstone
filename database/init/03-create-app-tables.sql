@@ -3,7 +3,7 @@ USE kidssmart_app;
 -- Activities table (unified from all scrapers)
 CREATE TABLE IF NOT EXISTS activities (
     activity_id INT AUTO_INCREMENT PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
+    title VARCHAR(255) NOT NULL UNIQUE,
     description TEXT,
     category VARCHAR(100),
     suburb VARCHAR(100),
