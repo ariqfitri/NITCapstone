@@ -9,11 +9,45 @@ require_once __DIR__ . '/models/Favourite.php';
 $appDatabase = new Database('kidssmart_app');
 $appDb = $appDatabase->getConnection();
 
-$userDatabase = new Database('kidssmart_users'); // ✅ FIXED! Use users database for favourites
+$userDatabase = new Database('kidssmart_users'); // Use users database for favourites
 $userDb = $userDatabase->getConnection();
 
 // Initialize models with correct databases
 $program = new Program($appDb);
+$favourite = new Favourite($userDb);
+
+// Handle favourite actions from search page
+if (is_logged_in() && isset($_POST['favourite_action'])) {
+    $action = $_POST['favourite_action'];
+    $activity_id = isset($_POST['activity_id']) ? intval($_POST['activity_id']) : 0;
+    $user_id = get_current_user_id();
+    
+    if ($activity_id > 0 && $user_id > 0) {
+        $favourite->user_id = $user_id;
+        $favourite->activity_id = $activity_id;
+        
+        if ($action === 'add') {
+            $favourite->create();
+        } elseif ($action === 'remove') {
+            $favourite->delete();
+        }
+    }
+    
+    // Redirect to avoid form resubmission, preserving search parameters
+    $redirect_params = [];
+    if (!empty($_GET['search'])) $redirect_params['search'] = $_GET['search'];
+    if (!empty($_GET['category'])) $redirect_params['category'] = $_GET['category'];
+    if (!empty($_GET['suburb'])) $redirect_params['suburb'] = $_GET['suburb'];
+    if (!empty($_GET['page'])) $redirect_params['page'] = $_GET['page'];
+    
+    $redirect_url = "search.php";
+    if (!empty($redirect_params)) {
+        $redirect_url .= "?" . http_build_query($redirect_params);
+    }
+    
+    header("Location: " . $redirect_url);
+    exit;
+}
 
 // Get search parameters
 $search = $_GET['search'] ?? '';
@@ -32,7 +66,6 @@ $total_results = $program->getSearchCount($search, $category, $suburb);
 $total_pages = ceil($total_results / $limit);
 
 // Check favourites for logged-in users
-$favourite = new Favourite($userDb); // ✅ FIXED! Use users database connection
 if (is_logged_in()) {
     $user_favourites = [];
     foreach ($programs as $activity) {
@@ -124,7 +157,7 @@ if (is_logged_in()) {
                                 <div class="d-flex justify-content-between align-items-start mb-2">
                                     <h5 class="card-title"><?= htmlspecialchars($activity['title']) ?></h5>
                                     <?php if (is_logged_in()): ?>
-                                        <form method="post" action="program_detail.php?id=<?= $activity['activity_id'] ?>" class="d-inline">
+                                        <form method="post" class="d-inline">
                                             <input type="hidden" name="activity_id" value="<?= $activity['activity_id'] ?>">
                                             <?php if ($user_favourites[$activity['activity_id']] ?? false): ?>
                                                 <input type="hidden" name="favourite_action" value="remove">
